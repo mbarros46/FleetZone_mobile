@@ -3,6 +3,7 @@
 Aplicativo mobile para mapeamento inteligente do pátio e gestão de motos, desenvolvido com React Native e Expo.
 
 ## Alunos
+
 - Pedro Valentim Merise – RM55556826
 - Miguel Barros Ramos – RM556652
 
@@ -31,11 +32,13 @@ Aplicativo mobile para mapeamento inteligente do pátio e gestão de motos, dese
 ## Como Executar Localmente
 
 1. Instale as dependências:
+
    ```bash
    npm install
    ```
 
 2. Inicie o projeto:
+
    ```bash
    npx expo start
    ```
@@ -46,6 +49,7 @@ Aplicativo mobile para mapeamento inteligente do pátio e gestão de motos, dese
    - `w` para Web
 
 ## Tecnologias Utilizadas
+
 - React Native + Expo
 - Expo Router
 - TypeScript

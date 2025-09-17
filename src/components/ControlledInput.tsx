@@ -1,8 +1,9 @@
 import React from 'react';
-import { StyleSheet, TextInput, TextInputProps } from 'react-native';
 import { Controller, Control, FieldError } from 'react-hook-form';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { StyleSheet, TextInput, TextInputProps } from 'react-native';
+
+import { ThemedText } from './ThemedText';
+import { ThemedView } from './ThemedView';
 
 interface ControlledInputProps extends TextInputProps {
   name: string;
@@ -29,10 +30,7 @@ export function ControlledInput({
         rules={rules}
         render={({ field: { onChange, onBlur, value } }) => (
           <TextInput
-            style={[
-              styles.input,
-              error && styles.inputError
-            ]}
+            style={[styles.input, error && styles.inputError]}
             onBlur={onBlur}
             onChangeText={onChange}
             value={value}
@@ -42,9 +40,7 @@ export function ControlledInput({
         )}
       />
       {error && (
-        <ThemedText style={styles.errorText}>
-          {error.message}
-        </ThemedText>
+        <ThemedText style={styles.errorText}>{error.message}</ThemedText>
       )}
     </ThemedView>
   );

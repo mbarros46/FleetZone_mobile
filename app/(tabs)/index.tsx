@@ -1,16 +1,17 @@
-import { StyleSheet } from 'react-native';
 import { Link } from 'expo-router';
+import { StyleSheet } from 'react-native';
 
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { ThemedText, ThemedView } from '../../src/components';
 import { useAccentColor } from '../../src/styles/theme';
 
 export default function HomeScreen() {
   const { accentColor } = useAccentColor();
   return (
     <ThemedView style={styles.container}>
-      <ThemedText type="title" style={styles.title}>Bem-vindo ao FleetZone</ThemedText>
-      
+      <ThemedText type="title" style={styles.title}>
+        Bem-vindo ao FleetZone
+      </ThemedText>
+
       <ThemedView style={styles.buttonContainer}>
         <Link href="/(tabs)/motos" asChild>
           <ThemedView style={[styles.button, { backgroundColor: accentColor }]}>

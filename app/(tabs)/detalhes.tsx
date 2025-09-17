@@ -1,17 +1,22 @@
 // detalhes.tsx com busca por chave/placa da moto
-import { useState } from 'react';
-import { StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import {
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+} from 'react-native';
+import { z } from 'zod';
 
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { ControlledInput } from '@/components/ControlledInput';
+import { ControlledInput, ThemedText, ThemedView } from '../../src/components';
+import { commonStyles } from '../../src/styles/common';
 import { useAccentColor } from '../../src/styles/theme';
 
 const buscaSchema = z.object({
-  placa: z.string()
+  placa: z
+    .string()
     .min(1, 'Placa é obrigatória')
     .regex(/^[A-Z]{3}-\d{4}$/, 'Placa deve seguir o formato ABC-1234')
     .toUpperCase(),
@@ -41,10 +46,16 @@ const motosMock = [
 ];
 
 export default function DetalhesScreen() {
-  const [motoSelecionada, setMotoSelecionada] = useState<typeof motosMock[0] | null>(null);
+  const [motoSelecionada, setMotoSelecionada] = useState<
+    (typeof motosMock)[0] | null
+  >(null);
   const { accentColor } = useAccentColor();
-  
-  const { control, handleSubmit, formState: { errors, isSubmitting } } = useForm<BuscaForm>({
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<BuscaForm>({
     resolver: zodResolver(buscaSchema),
     defaultValues: {
       placa: '',
@@ -54,9 +65,11 @@ export default function DetalhesScreen() {
   const onSubmit = async (data: BuscaForm) => {
     try {
       // Simular busca na API
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const moto = motosMock.find((m) => m.placa.toLowerCase() === data.placa.toLowerCase());
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      const moto = motosMock.find(
+        (m) => m.placa.toLowerCase() === data.placa.toLowerCase(),
+      );
       if (moto) {
         setMotoSelecionada(moto);
       } else {
@@ -70,7 +83,9 @@ export default function DetalhesScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <ThemedText type="title" style={styles.title}>Buscar Moto por Chave</ThemedText>
+      <ThemedText type="title" style={styles.title}>
+        Buscar Moto por Chave
+      </ThemedText>
 
       <ControlledInput
         name="placa"
@@ -82,12 +97,12 @@ export default function DetalhesScreen() {
         maxLength={8}
       />
 
-      <TouchableOpacity 
+      <TouchableOpacity
         style={[
-          styles.button, 
+          styles.button,
           { backgroundColor: accentColor },
-          isSubmitting && styles.buttonDisabled
-        ]} 
+          isSubmitting && styles.buttonDisabled,
+        ]}
         onPress={handleSubmit(onSubmit)}
         disabled={isSubmitting}
       >
@@ -110,16 +125,24 @@ export default function DetalhesScreen() {
           <ThemedText style={styles.value}>{motoSelecionada.patio}</ThemedText>
 
           <ThemedText style={styles.label}>📅 Data de Entrada:</ThemedText>
-          <ThemedText style={styles.value}>{motoSelecionada.dataEntrada}</ThemedText>
+          <ThemedText style={styles.value}>
+            {motoSelecionada.dataEntrada}
+          </ThemedText>
 
           <ThemedText style={styles.label}>🕒 Km Rodados:</ThemedText>
           <ThemedText style={styles.value}>{motoSelecionada.km} km</ThemedText>
 
           <ThemedText style={styles.label}>🧰 Status:</ThemedText>
-          <ThemedText style={[styles.value, getStatusStyle(motoSelecionada.status)]}>{motoSelecionada.status}</ThemedText>
+          <ThemedText
+            style={[styles.value, getStatusStyle(motoSelecionada.status)]}
+          >
+            {motoSelecionada.status}
+          </ThemedText>
 
           <ThemedText style={styles.label}>🔧 Próxima Manutenção:</ThemedText>
-          <ThemedText style={styles.value}>{motoSelecionada.manutencao}</ThemedText>
+          <ThemedText style={styles.value}>
+            {motoSelecionada.manutencao}
+          </ThemedText>
         </ThemedView>
       )}
     </ThemedView>
@@ -133,21 +156,13 @@ function getStatusStyle(status: string) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  title: { marginBottom: 20, textAlign: 'center' },
-  button: {
-    padding: 15,
-    borderRadius: 8,
-    alignItems: 'center',
+  ...commonStyles,
+  container: {
+    ...commonStyles.container,
+  },
+  title: {
+    ...commonStyles.title,
     marginBottom: 20,
-  },
-  buttonDisabled: {
-    opacity: 0.6,
-  },
-  buttonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
   },
   infoBox: {
     backgroundColor: '#f0f0f0',
@@ -155,6 +170,13 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     gap: 10,
   },
-  label: { fontSize: 16, fontWeight: 'bold', color: 'black' },
-  value: { fontSize: 16, color: 'black' },
+  label: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: 'black',
+  },
+  value: {
+    fontSize: 16,
+    color: 'black',
+  },
 });

@@ -1,14 +1,24 @@
 // motos.tsx atualizado com texto preto para melhor visibilidade
-import { StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+
+import { ThemedText, ThemedView } from '../../src/components';
 
 const motosMock = [
   { id: '1', modelo: 'Honda CG 160', placa: 'ABC-1234', status: 'Disponível' },
-  { id: '2', modelo: 'Yamaha Fazer 250', placa: 'XYZ-5678', status: 'Em manutenção' },
+  {
+    id: '2',
+    modelo: 'Yamaha Fazer 250',
+    placa: 'XYZ-5678',
+    status: 'Em manutenção',
+  },
   { id: '3', modelo: 'Honda Biz 125', placa: 'DEF-9012', status: 'Disponível' },
-  { id: '4', modelo: 'Yamaha Crosser 150', placa: 'GHI-3456', status: 'Indisponível' },
+  {
+    id: '4',
+    modelo: 'Yamaha Crosser 150',
+    placa: 'GHI-3456',
+    status: 'Indisponível',
+  },
 ];
 
 export default function MotosScreen() {
@@ -16,20 +26,30 @@ export default function MotosScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <ThemedText type="title" style={styles.title}>Motos Disponíveis</ThemedText>
+      <ThemedText type="title" style={styles.title}>
+        Motos Disponíveis
+      </ThemedText>
       <FlatList
         data={motosMock}
-        keyExtractor={item => item.id}
+        keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <TouchableOpacity
             style={styles.item}
             onPress={() =>
-              router.push(`/detalhes?modelo=${encodeURIComponent(item.modelo)}&placa=${encodeURIComponent(item.placa)}`)
+              router.push(
+                `/detalhes?modelo=${encodeURIComponent(item.modelo)}&placa=${encodeURIComponent(item.placa)}`,
+              )
             }
           >
-            <ThemedText style={[styles.itemText, styles.darkText]}>{item.modelo}</ThemedText>
-            <ThemedText style={[styles.itemText, styles.darkText]}>{item.placa}</ThemedText>
-            <ThemedText style={[styles.status, getStatusStyle(item.status)]}>{item.status}</ThemedText>
+            <ThemedText style={[styles.itemText, styles.darkText]}>
+              {item.modelo}
+            </ThemedText>
+            <ThemedText style={[styles.itemText, styles.darkText]}>
+              {item.placa}
+            </ThemedText>
+            <ThemedText style={[styles.status, getStatusStyle(item.status)]}>
+              {item.status}
+            </ThemedText>
           </TouchableOpacity>
         )}
       />

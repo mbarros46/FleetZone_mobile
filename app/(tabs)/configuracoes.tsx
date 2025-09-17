@@ -1,19 +1,27 @@
-import { useEffect } from 'react';
-import { StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import {
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+} from 'react-native';
+import { z } from 'zod';
 
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { ControlledInput } from '@/components/ControlledInput';
+import { ControlledInput, ThemedText, ThemedView } from '../../src/components';
 import { useThemeCustom } from '../../src/contexts/theme';
+import { commonStyles } from '../../src/styles/common';
 import { useAccentColor } from '../../src/styles/theme';
 
 const configSchema = z.object({
-  corDestaque: z.string()
+  corDestaque: z
+    .string()
     .min(1, 'Cor de destaque é obrigatória')
-    .regex(/^#[0-9A-Fa-f]{6}$/, 'Cor deve estar no formato hexadecimal (#RRGGBB)')
+    .regex(
+      /^#[0-9A-Fa-f]{6}$/,
+      'Cor deve estar no formato hexadecimal (#RRGGBB)',
+    )
     .toUpperCase(),
 });
 
@@ -22,8 +30,13 @@ type ConfigForm = z.infer<typeof configSchema>;
 export default function ConfiguracoesScreen() {
   const { mode, setMode } = useThemeCustom();
   const { accentColor, saveAccentColor } = useAccentColor();
-  
-  const { control, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm<ConfigForm>({
+
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    formState: { errors, isSubmitting },
+  } = useForm<ConfigForm>({
     resolver: zodResolver(configSchema),
     defaultValues: {
       corDestaque: '',
@@ -45,7 +58,9 @@ export default function ConfiguracoesScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <ThemedText type="title" style={styles.title}>Configurações</ThemedText>
+      <ThemedText type="title" style={styles.title}>
+        Configurações
+      </ThemedText>
 
       <ThemedView style={styles.form}>
         <ControlledInput
@@ -60,35 +75,44 @@ export default function ConfiguracoesScreen() {
 
         <ThemedView style={styles.themeContainer}>
           <ThemedText style={styles.label}>Tema:</ThemedText>
-          
-          <TouchableOpacity 
-            style={[styles.themeOption, mode === 'light' && styles.themeOptionSelected]}
+
+          <TouchableOpacity
+            style={[
+              styles.themeOption,
+              mode === 'light' && styles.themeOptionSelected,
+            ]}
             onPress={() => setMode('light')}
           >
             <ThemedText style={styles.themeOptionText}>☀️ Claro</ThemedText>
           </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={[styles.themeOption, mode === 'dark' && styles.themeOptionSelected]}
+
+          <TouchableOpacity
+            style={[
+              styles.themeOption,
+              mode === 'dark' && styles.themeOptionSelected,
+            ]}
             onPress={() => setMode('dark')}
           >
             <ThemedText style={styles.themeOptionText}>🌙 Escuro</ThemedText>
           </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={[styles.themeOption, mode === 'system' && styles.themeOptionSelected]}
+
+          <TouchableOpacity
+            style={[
+              styles.themeOption,
+              mode === 'system' && styles.themeOptionSelected,
+            ]}
             onPress={() => setMode('system')}
           >
             <ThemedText style={styles.themeOptionText}>📱 Sistema</ThemedText>
           </TouchableOpacity>
         </ThemedView>
 
-        <TouchableOpacity 
+        <TouchableOpacity
           style={[
-            styles.button, 
+            styles.button,
             { backgroundColor: accentColor },
-            isSubmitting && styles.buttonDisabled
-          ]} 
+            isSubmitting && styles.buttonDisabled,
+          ]}
           onPress={handleSubmit(onSubmit)}
           disabled={isSubmitting}
         >
@@ -104,10 +128,12 @@ export default function ConfiguracoesScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  title: { marginBottom: 30, textAlign: 'center' },
-  form: { gap: 20 },
-  label: { fontSize: 16, fontWeight: 'bold', marginBottom: 10 },
+  ...commonStyles,
+  label: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
   themeContainer: {
     gap: 10,
   },
@@ -125,18 +151,5 @@ const styles = StyleSheet.create({
   themeOptionText: {
     fontSize: 16,
     textAlign: 'center',
-  },
-  button: {
-    padding: 15,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  buttonDisabled: {
-    opacity: 0.6,
-  },
-  buttonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
   },
 });

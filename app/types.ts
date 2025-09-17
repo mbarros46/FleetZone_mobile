@@ -1,4 +1,3 @@
-
 export type RootStackParamList = {
   '(tabs)': undefined;
   '(tabs)/index': undefined;
@@ -15,4 +14,4 @@ declare global {
   namespace ReactNavigation {
     interface RootParamList extends RootStackParamList {}
   }
-} 
+}

@@ -1,28 +1,51 @@
 // explore.tsx atualizado com texto preto
-import { StyleSheet, FlatList, TextInput } from 'react-native';
 import { useState } from 'react';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { StyleSheet, FlatList, TextInput } from 'react-native';
+
+import { ThemedText, ThemedView } from '../../src/components';
 
 const dadosMockados = [
-  { id: '1', modelo: 'Honda CG 160', patio: 'Pátio A', localizacao: 'São Paulo' },
-  { id: '2', modelo: 'Yamaha Fazer 250', patio: 'Pátio B', localizacao: 'Campinas' },
-  { id: '3', modelo: 'Honda Biz 125', patio: 'Pátio A', localizacao: 'São Paulo' },
-  { id: '4', modelo: 'Yamaha Crosser 150', patio: 'Pátio C', localizacao: 'Santos' },
+  {
+    id: '1',
+    modelo: 'Honda CG 160',
+    patio: 'Pátio A',
+    localizacao: 'São Paulo',
+  },
+  {
+    id: '2',
+    modelo: 'Yamaha Fazer 250',
+    patio: 'Pátio B',
+    localizacao: 'Campinas',
+  },
+  {
+    id: '3',
+    modelo: 'Honda Biz 125',
+    patio: 'Pátio A',
+    localizacao: 'São Paulo',
+  },
+  {
+    id: '4',
+    modelo: 'Yamaha Crosser 150',
+    patio: 'Pátio C',
+    localizacao: 'Santos',
+  },
 ];
 
 export default function ExploreScreen() {
   const [busca, setBusca] = useState('');
 
-  const resultados = dadosMockados.filter(item =>
-    item.modelo.toLowerCase().includes(busca.toLowerCase()) ||
-    item.localizacao.toLowerCase().includes(busca.toLowerCase()) ||
-    item.patio.toLowerCase().includes(busca.toLowerCase())
+  const resultados = dadosMockados.filter(
+    (item) =>
+      item.modelo.toLowerCase().includes(busca.toLowerCase()) ||
+      item.localizacao.toLowerCase().includes(busca.toLowerCase()) ||
+      item.patio.toLowerCase().includes(busca.toLowerCase()),
   );
 
   return (
     <ThemedView style={styles.container}>
-      <ThemedText type="title" style={styles.title}>Explorar Motos</ThemedText>
+      <ThemedText type="title" style={styles.title}>
+        Explorar Motos
+      </ThemedText>
       <TextInput
         style={styles.input}
         placeholder="Buscar por modelo, local ou pátio"
@@ -32,12 +55,18 @@ export default function ExploreScreen() {
       />
       <FlatList
         data={resultados}
-        keyExtractor={item => item.id}
+        keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <ThemedView style={styles.item}>
-            <ThemedText style={[styles.itemTitle, styles.darkText]}>{item.modelo}</ThemedText>
-            <ThemedText style={[styles.itemText, styles.darkText]}>Pátio: {item.patio}</ThemedText>
-            <ThemedText style={[styles.itemText, styles.darkText]}>Localização: {item.localizacao}</ThemedText>
+            <ThemedText style={[styles.itemTitle, styles.darkText]}>
+              {item.modelo}
+            </ThemedText>
+            <ThemedText style={[styles.itemText, styles.darkText]}>
+              Pátio: {item.patio}
+            </ThemedText>
+            <ThemedText style={[styles.itemText, styles.darkText]}>
+              Localização: {item.localizacao}
+            </ThemedText>
           </ThemedView>
         )}
       />
@@ -54,7 +83,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 20,
     fontSize: 16,
-    color: 'black'
+    color: 'black',
   },
   item: {
     backgroundColor: '#e0e0e0',
