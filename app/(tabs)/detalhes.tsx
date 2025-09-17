@@ -1,9 +1,23 @@
 // detalhes.tsx com busca por chave/placa da moto
 import { useState } from 'react';
-import { StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { ControlledInput } from '@/components/ControlledInput';
 import { useAccentColor } from '../../src/styles/theme';
+
+const buscaSchema = z.object({
+  placa: z.string()
+    .min(1, 'Placa é obrigatória')
+    .regex(/^[A-Z]{3}-\d{4}$/, 'Placa deve seguir o formato ABC-1234')
+    .toUpperCase(),
+});
+
+type BuscaForm = z.infer<typeof buscaSchema>;
 
 const motosMock = [
   {
@@ -27,17 +41,30 @@ const motosMock = [
 ];
 
 export default function DetalhesScreen() {
-  const [placa, setPlaca] = useState('');
   const [motoSelecionada, setMotoSelecionada] = useState<typeof motosMock[0] | null>(null);
   const { accentColor } = useAccentColor();
+  
+  const { control, handleSubmit, formState: { errors, isSubmitting } } = useForm<BuscaForm>({
+    resolver: zodResolver(buscaSchema),
+    defaultValues: {
+      placa: '',
+    },
+  });
 
-  const buscarMoto = () => {
-    const moto = motosMock.find((m) => m.placa.toLowerCase() === placa.toLowerCase());
-    if (moto) {
-      setMotoSelecionada(moto);
-    } else {
-      setMotoSelecionada(null);
-      Alert.alert('Moto não encontrada', 'Verifique a chave/placa digitada.');
+  const onSubmit = async (data: BuscaForm) => {
+    try {
+      // Simular busca na API
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const moto = motosMock.find((m) => m.placa.toLowerCase() === data.placa.toLowerCase());
+      if (moto) {
+        setMotoSelecionada(moto);
+      } else {
+        setMotoSelecionada(null);
+        Alert.alert('Moto não encontrada', 'Verifique a chave/placa digitada.');
+      }
+    } catch (error) {
+      Alert.alert('Erro', 'Não foi possível buscar a moto. Tente novamente.');
     }
   };
 
@@ -45,19 +72,30 @@ export default function DetalhesScreen() {
     <ThemedView style={styles.container}>
       <ThemedText type="title" style={styles.title}>Buscar Moto por Chave</ThemedText>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Digite a placa (ex: ABC-1234)"
-        value={placa}
-        onChangeText={setPlaca}
-        placeholderTextColor="#999"
+      <ControlledInput
+        name="placa"
+        control={control}
+        label="Placa da Moto:"
+        placeholder="Digite a placa (ABC-1234)"
+        error={errors.placa}
+        autoCapitalize="characters"
+        maxLength={8}
       />
 
       <TouchableOpacity 
-        style={[styles.button, { backgroundColor: accentColor }]} 
-        onPress={buscarMoto}
+        style={[
+          styles.button, 
+          { backgroundColor: accentColor },
+          isSubmitting && styles.buttonDisabled
+        ]} 
+        onPress={handleSubmit(onSubmit)}
+        disabled={isSubmitting}
       >
-        <ThemedText style={styles.buttonText}>Buscar</ThemedText>
+        {isSubmitting ? (
+          <ActivityIndicator color="white" size="small" />
+        ) : (
+          <ThemedText style={styles.buttonText}>Buscar</ThemedText>
+        )}
       </TouchableOpacity>
 
       {motoSelecionada && (
@@ -97,19 +135,14 @@ function getStatusStyle(status: string) {
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20 },
   title: { marginBottom: 20, textAlign: 'center' },
-  input: {
-    backgroundColor: '#f0f0f0',
-    padding: 15,
-    borderRadius: 8,
-    fontSize: 16,
-    color: 'black',
-    marginBottom: 10,
-  },
   button: {
     padding: 15,
     borderRadius: 8,
     alignItems: 'center',
     marginBottom: 20,
+  },
+  buttonDisabled: {
+    opacity: 0.6,
   },
   buttonText: {
     color: 'white',

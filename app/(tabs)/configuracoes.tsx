@@ -1,28 +1,44 @@
-import { useState, useEffect } from 'react';
-import { StyleSheet, TextInput, TouchableOpacity, Alert, Switch, View } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useEffect } from 'react';
+import { StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { ControlledInput } from '@/components/ControlledInput';
 import { useThemeCustom } from '../../src/contexts/theme';
 import { useAccentColor } from '../../src/styles/theme';
+
+const configSchema = z.object({
+  corDestaque: z.string()
+    .min(1, 'Cor de destaque é obrigatória')
+    .regex(/^#[0-9A-Fa-f]{6}$/, 'Cor deve estar no formato hexadecimal (#RRGGBB)')
+    .toUpperCase(),
+});
+
+type ConfigForm = z.infer<typeof configSchema>;
 
 export default function ConfiguracoesScreen() {
   const { mode, setMode } = useThemeCustom();
   const { accentColor, saveAccentColor } = useAccentColor();
-  const [corDestaque, setCorDestaque] = useState('');
+  
+  const { control, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm<ConfigForm>({
+    resolver: zodResolver(configSchema),
+    defaultValues: {
+      corDestaque: '',
+    },
+  });
 
   useEffect(() => {
-    setCorDestaque(accentColor);
-  }, [accentColor]);
+    setValue('corDestaque', accentColor);
+  }, [accentColor, setValue]);
 
-  const salvarConfiguracoes = async () => {
+  const onSubmit = async (data: ConfigForm) => {
     try {
-      if (corDestaque) {
-        await saveAccentColor(corDestaque);
-      }
+      await saveAccentColor(data.corDestaque);
       Alert.alert('Sucesso', 'Configurações salvas!');
-    } catch {
+    } catch (error) {
       Alert.alert('Erro', 'Não foi possível salvar as configurações');
     }
   };
@@ -32,13 +48,14 @@ export default function ConfiguracoesScreen() {
       <ThemedText type="title" style={styles.title}>Configurações</ThemedText>
 
       <ThemedView style={styles.form}>
-        <ThemedText style={styles.label}>Cor de Destaque:</ThemedText>
-        <TextInput
-          style={styles.input}
-          value={corDestaque}
-          onChangeText={setCorDestaque}
-          placeholder="Digite a cor (ex: #FF0000)"
-          placeholderTextColor="#999"
+        <ControlledInput
+          name="corDestaque"
+          control={control}
+          label="Cor de Destaque:"
+          placeholder="Digite a cor (#FF0000)"
+          error={errors.corDestaque}
+          autoCapitalize="characters"
+          maxLength={7}
         />
 
         <ThemedView style={styles.themeContainer}>
@@ -67,10 +84,19 @@ export default function ConfiguracoesScreen() {
         </ThemedView>
 
         <TouchableOpacity 
-          style={[styles.button, { backgroundColor: accentColor }]} 
-          onPress={salvarConfiguracoes}
+          style={[
+            styles.button, 
+            { backgroundColor: accentColor },
+            isSubmitting && styles.buttonDisabled
+          ]} 
+          onPress={handleSubmit(onSubmit)}
+          disabled={isSubmitting}
         >
-          <ThemedText style={styles.buttonText}>Salvar</ThemedText>
+          {isSubmitting ? (
+            <ActivityIndicator color="white" size="small" />
+          ) : (
+            <ThemedText style={styles.buttonText}>Salvar</ThemedText>
+          )}
         </TouchableOpacity>
       </ThemedView>
     </ThemedView>
@@ -82,12 +108,6 @@ const styles = StyleSheet.create({
   title: { marginBottom: 30, textAlign: 'center' },
   form: { gap: 20 },
   label: { fontSize: 16, fontWeight: 'bold', marginBottom: 10 },
-  input: {
-    backgroundColor: '#f0f0f0',
-    padding: 15,
-    borderRadius: 8,
-    fontSize: 16,
-  },
   themeContainer: {
     gap: 10,
   },
@@ -110,6 +130,9 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 8,
     alignItems: 'center',
+  },
+  buttonDisabled: {
+    opacity: 0.6,
   },
   buttonText: {
     color: 'white',

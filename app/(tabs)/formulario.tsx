@@ -1,21 +1,55 @@
-import { useState } from 'react';
-import { StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { ControlledInput } from '@/components/ControlledInput';
 import { useAccentColor } from '../../src/styles/theme';
 
-export default function FormularioScreen() {
-  const [modelo, setModelo] = useState('');
-  const [placa, setPlaca] = useState('');
-  const { accentColor } = useAccentColor();
+const motoSchema = z.object({
+  modelo: z.string()
+    .min(1, 'Modelo é obrigatório')
+    .min(3, 'Modelo deve ter pelo menos 3 caracteres')
+    .max(50, 'Modelo deve ter no máximo 50 caracteres'),
+  placa: z.string()
+    .min(1, 'Placa é obrigatória')
+    .regex(/^[A-Z]{3}-\d{4}$/, 'Placa deve seguir o formato ABC-1234')
+    .toUpperCase(),
+});
 
-  const handleSalvar = () => {
-    Alert.alert(
-      'Dados da Moto',
-      `Modelo: ${modelo}\nPlaca: ${placa}`,
-      [{ text: 'OK' }]
-    );
+type MotoForm = z.infer<typeof motoSchema>;
+
+export default function FormularioScreen() {
+  const { accentColor } = useAccentColor();
+  
+  const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<MotoForm>({
+    resolver: zodResolver(motoSchema),
+    defaultValues: {
+      modelo: '',
+      placa: '',
+    },
+  });
+
+  const onSubmit = async (data: MotoForm) => {
+    try {
+      // Simular uma chamada de API
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      Alert.alert(
+        'Moto Cadastrada!',
+        `Modelo: ${data.modelo}\nPlaca: ${data.placa}`,
+        [
+          { 
+            text: 'OK', 
+            onPress: () => reset() // Limpa o formulário após sucesso
+          }
+        ]
+      );
+    } catch (error) {
+      Alert.alert('Erro', 'Não foi possível cadastrar a moto. Tente novamente.');
+    }
   };
 
   return (
@@ -23,29 +57,39 @@ export default function FormularioScreen() {
       <ThemedText type="title" style={styles.title}>Cadastrar Nova Moto</ThemedText>
       
       <ThemedView style={styles.form}>
-        <ThemedText style={styles.label}>Modelo da Moto:</ThemedText>
-        <TextInput
-          style={styles.input}
-          value={modelo}
-          onChangeText={setModelo}
-          placeholder="Digite o modelo"
-          placeholderTextColor="#999"
+        <ControlledInput
+          name="modelo"
+          control={control}
+          label="Modelo da Moto:"
+          placeholder="Digite o modelo (ex: Honda CG 160)"
+          error={errors.modelo}
+          autoCapitalize="words"
         />
 
-        <ThemedText style={styles.label}>Placa da Moto:</ThemedText>
-        <TextInput
-          style={styles.input}
-          value={placa}
-          onChangeText={setPlaca}
-          placeholder="Digite a placa"
-          placeholderTextColor="#999"
+        <ControlledInput
+          name="placa"
+          control={control}
+          label="Placa da Moto:"
+          placeholder="Digite a placa (ABC-1234)"
+          error={errors.placa}
+          autoCapitalize="characters"
+          maxLength={8}
         />
 
         <TouchableOpacity 
-          style={[styles.button, { backgroundColor: accentColor }]} 
-          onPress={handleSalvar}
+          style={[
+            styles.button, 
+            { backgroundColor: accentColor },
+            isSubmitting && styles.buttonDisabled
+          ]} 
+          onPress={handleSubmit(onSubmit)}
+          disabled={isSubmitting}
         >
-          <ThemedText style={styles.buttonText}>Salvar</ThemedText>
+          {isSubmitting ? (
+            <ActivityIndicator color="white" size="small" />
+          ) : (
+            <ThemedText style={styles.buttonText}>Salvar</ThemedText>
+          )}
         </TouchableOpacity>
       </ThemedView>
     </ThemedView>
@@ -64,23 +108,14 @@ const styles = StyleSheet.create({
   form: {
     gap: 10,
   },
-  label: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 5,
-  },
-  input: {
-    backgroundColor: '#f0f0f0',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 20,
-    fontSize: 16,
-  },
   button: {
     padding: 15,
     borderRadius: 8,
     alignItems: 'center',
     marginTop: 10,
+  },
+  buttonDisabled: {
+    opacity: 0.6,
   },
   buttonText: {
     color: 'white',
