@@ -1,36 +1,26 @@
 import { useState, useEffect } from 'react';
-import { StyleSheet, TextInput, TouchableOpacity, Alert, Switch } from 'react-native';
+import { StyleSheet, TextInput, TouchableOpacity, Alert, Switch, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-
-const COR_DESTAQUE_KEY = '@fleetzone_cor_destaque';
-const MODO_ESCURO_KEY = '@fleetzone_modo_escuro';
+import { useThemeCustom } from '../../src/contexts/theme';
+import { useAccentColor } from '../../src/styles/theme';
 
 export default function ConfiguracoesScreen() {
+  const { mode, setMode } = useThemeCustom();
+  const { accentColor, saveAccentColor } = useAccentColor();
   const [corDestaque, setCorDestaque] = useState('');
-  const [modoEscuro, setModoEscuro] = useState(false);
 
   useEffect(() => {
-    loadConfiguracoes();
-  }, []);
-
-  const loadConfiguracoes = async () => {
-    try {
-      const corSalva = await AsyncStorage.getItem(COR_DESTAQUE_KEY);
-      const modoEscuroSalvo = await AsyncStorage.getItem(MODO_ESCURO_KEY);
-      if (corSalva) setCorDestaque(corSalva);
-      if (modoEscuroSalvo) setModoEscuro(modoEscuroSalvo === 'true');
-    } catch {
-      Alert.alert('Erro', 'Não foi possível carregar as configurações');
-    }
-  };
+    setCorDestaque(accentColor);
+  }, [accentColor]);
 
   const salvarConfiguracoes = async () => {
     try {
-      await AsyncStorage.setItem(COR_DESTAQUE_KEY, corDestaque);
-      await AsyncStorage.setItem(MODO_ESCURO_KEY, modoEscuro.toString());
+      if (corDestaque) {
+        await saveAccentColor(corDestaque);
+      }
       Alert.alert('Sucesso', 'Configurações salvas!');
     } catch {
       Alert.alert('Erro', 'Não foi possível salvar as configurações');
@@ -51,12 +41,35 @@ export default function ConfiguracoesScreen() {
           placeholderTextColor="#999"
         />
 
-        <ThemedView style={styles.switchContainer}>
-          <ThemedText style={styles.label}>Modo Escuro:</ThemedText>
-          <Switch value={modoEscuro} onValueChange={setModoEscuro} />
+        <ThemedView style={styles.themeContainer}>
+          <ThemedText style={styles.label}>Tema:</ThemedText>
+          
+          <TouchableOpacity 
+            style={[styles.themeOption, mode === 'light' && styles.themeOptionSelected]}
+            onPress={() => setMode('light')}
+          >
+            <ThemedText style={styles.themeOptionText}>☀️ Claro</ThemedText>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={[styles.themeOption, mode === 'dark' && styles.themeOptionSelected]}
+            onPress={() => setMode('dark')}
+          >
+            <ThemedText style={styles.themeOptionText}>🌙 Escuro</ThemedText>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={[styles.themeOption, mode === 'system' && styles.themeOptionSelected]}
+            onPress={() => setMode('system')}
+          >
+            <ThemedText style={styles.themeOptionText}>📱 Sistema</ThemedText>
+          </TouchableOpacity>
         </ThemedView>
 
-        <TouchableOpacity style={styles.button} onPress={salvarConfiguracoes}>
+        <TouchableOpacity 
+          style={[styles.button, { backgroundColor: accentColor }]} 
+          onPress={salvarConfiguracoes}
+        >
           <ThemedText style={styles.buttonText}>Salvar</ThemedText>
         </TouchableOpacity>
       </ThemedView>
@@ -68,20 +81,32 @@ const styles = StyleSheet.create({
   container: { flex: 1, padding: 20 },
   title: { marginBottom: 30, textAlign: 'center' },
   form: { gap: 20 },
-  label: { fontSize: 16, fontWeight: 'bold' },
+  label: { fontSize: 16, fontWeight: 'bold', marginBottom: 10 },
   input: {
     backgroundColor: '#f0f0f0',
     padding: 15,
     borderRadius: 8,
     fontSize: 16,
   },
-  switchContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+  themeContainer: {
+    gap: 10,
+  },
+  themeOption: {
+    padding: 15,
+    borderRadius: 8,
+    backgroundColor: '#f0f0f0',
+    borderWidth: 2,
+    borderColor: 'transparent',
+  },
+  themeOptionSelected: {
+    borderColor: '#0a7ea4',
+    backgroundColor: '#e6f3f7',
+  },
+  themeOptionText: {
+    fontSize: 16,
+    textAlign: 'center',
   },
   button: {
-    backgroundColor: '#0a7ea4',
     padding: 15,
     borderRadius: 8,
     alignItems: 'center',

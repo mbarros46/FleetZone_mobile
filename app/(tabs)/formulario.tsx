@@ -3,10 +3,12 @@ import { StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { useAccentColor } from '../../src/styles/theme';
 
 export default function FormularioScreen() {
   const [modelo, setModelo] = useState('');
   const [placa, setPlaca] = useState('');
+  const { accentColor } = useAccentColor();
 
   const handleSalvar = () => {
     Alert.alert(
@@ -39,7 +41,10 @@ export default function FormularioScreen() {
           placeholderTextColor="#999"
         />
 
-        <TouchableOpacity style={styles.button} onPress={handleSalvar}>
+        <TouchableOpacity 
+          style={[styles.button, { backgroundColor: accentColor }]} 
+          onPress={handleSalvar}
+        >
           <ThemedText style={styles.buttonText}>Salvar</ThemedText>
         </TouchableOpacity>
       </ThemedView>
@@ -72,7 +77,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   button: {
-    backgroundColor: '#0a7ea4',
     padding: 15,
     borderRadius: 8,
     alignItems: 'center',

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { useAccentColor } from '../../src/styles/theme';
 
 const motosMock = [
   {
@@ -28,6 +29,7 @@ const motosMock = [
 export default function DetalhesScreen() {
   const [placa, setPlaca] = useState('');
   const [motoSelecionada, setMotoSelecionada] = useState<typeof motosMock[0] | null>(null);
+  const { accentColor } = useAccentColor();
 
   const buscarMoto = () => {
     const moto = motosMock.find((m) => m.placa.toLowerCase() === placa.toLowerCase());
@@ -51,7 +53,10 @@ export default function DetalhesScreen() {
         placeholderTextColor="#999"
       />
 
-      <TouchableOpacity style={styles.button} onPress={buscarMoto}>
+      <TouchableOpacity 
+        style={[styles.button, { backgroundColor: accentColor }]} 
+        onPress={buscarMoto}
+      >
         <ThemedText style={styles.buttonText}>Buscar</ThemedText>
       </TouchableOpacity>
 
@@ -101,7 +106,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   button: {
-    backgroundColor: '#0a7ea4',
     padding: 15,
     borderRadius: 8,
     alignItems: 'center',
