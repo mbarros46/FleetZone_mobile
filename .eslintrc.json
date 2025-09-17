@@ -19,7 +19,7 @@
     ],
     "import/no-unresolved": "off",
     "import/namespace": "off",
-    "react/no-unstable-nested-components": "warn"
+    "react/no-unstable-nested-components": ["warn", { "allowAsProps": true }]
   },
   "ignorePatterns": ["node_modules/", "dist/", "build/", ".expo/"]
 }

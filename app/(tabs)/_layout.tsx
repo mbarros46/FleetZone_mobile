@@ -8,6 +8,23 @@ import TabBarBackground from '../../components/ui/TabBarBackground';
 import { Colors } from '../../constants/Colors';
 import { useColorScheme } from '../../hooks/useColorScheme';
 
+// Componentes de ícones extraídos
+const HomeIcon = ({ color }: { color: string }) => (
+  <IconSymbol size={28} name="house.fill" color={color} />
+);
+
+const MotosIcon = ({ color }: { color: string }) => (
+  <IconSymbol size={28} name="list.bullet" color={color} />
+);
+
+const FormIcon = ({ color }: { color: string }) => (
+  <IconSymbol size={28} name="plus.circle.fill" color={color} />
+);
+
+const ConfigIcon = ({ color }: { color: string }) => (
+  <IconSymbol size={28} name="gear" color={color} />
+);
+
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
@@ -31,36 +48,28 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="house.fill" color={color} />
-          ),
+          tabBarIcon: HomeIcon,
         }}
       />
       <Tabs.Screen
         name="motos"
         options={{
           title: 'Motos',
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="list.bullet" color={color} />
-          ),
+          tabBarIcon: MotosIcon,
         }}
       />
       <Tabs.Screen
         name="formulario"
         options={{
           title: 'Cadastrar',
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="plus.circle.fill" color={color} />
-          ),
+          tabBarIcon: FormIcon,
         }}
       />
       <Tabs.Screen
         name="configuracoes"
         options={{
           title: 'Config',
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="gear" color={color} />
-          ),
+          tabBarIcon: ConfigIcon,
         }}
       />
     </Tabs>
