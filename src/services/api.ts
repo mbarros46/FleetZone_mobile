@@ -32,3 +32,20 @@ export const getAuthHeaders = (token?: string) => ({
   ...apiConfig.headers,
   ...(token && { Authorization: `Bearer ${token}` }),
 });
+
+// Função helper para requisições autenticadas
+export const authenticatedFetch = async (url: string, options: RequestInit = {}, token?: string) => {
+  const response = await fetch(url, {
+    ...options,
+    headers: {
+      ...getAuthHeaders(token),
+      ...options.headers,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(await response.text());
+  }
+
+  return response;
+};
