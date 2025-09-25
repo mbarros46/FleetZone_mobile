@@ -14,6 +14,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { ControlledInput, ThemedText, ThemedView } from '../../src/components';
 import { useAccentColor } from '../../src/styles/theme';
+import { useThemeColor } from '../../hooks/useThemeColor';
 
 const buscaSchema = z.object({
   placa: z

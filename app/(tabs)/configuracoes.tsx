@@ -15,6 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { ControlledInput, ThemedText, ThemedView } from '../../src/components';
 import { useThemeCustom } from '../../src/contexts/theme';
 import { useAccentColor } from '../../src/styles/theme';
+import { useThemeColor } from '../../hooks/useThemeColor';
 
 const configSchema = z.object({
   corDestaque: z

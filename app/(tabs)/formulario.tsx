@@ -13,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { ControlledInput, ThemedText, ThemedView } from '../../src/components';
 import { useAccentColor } from '../../src/styles/theme';
+import { useThemeColor } from '../../hooks/useThemeColor';
 
 const motoSchema = z.object({
   modelo: z
@@ -31,6 +32,8 @@ type MotoForm = z.infer<typeof motoSchema>;
 
 export default function FormularioScreen() {
   const { accentColor } = useAccentColor();
+  const cardColor = useThemeColor({}, 'card');
+  const borderColor = useThemeColor({}, 'border');
 
   const {
     control,
@@ -85,7 +88,7 @@ export default function FormularioScreen() {
         </View>
 
         {/* Form Card */}
-        <View style={styles.formCard}>
+        <ThemedView style={[styles.formCard, { backgroundColor: cardColor, borderColor: borderColor }]}>
           <View style={styles.formHeader}>
             <Ionicons name="document-text" size={20} color={accentColor} />
             <ThemedText style={styles.formTitle}>Informações da Moto</ThemedText>
@@ -160,7 +163,7 @@ export default function FormularioScreen() {
               <ThemedText style={styles.clearButtonText}>Limpar Formulário</ThemedText>
             </TouchableOpacity>
           </View>
-        </View>
+        </ThemedView>
 
         {/* Helper Text */}
         <View style={styles.helperSection}>
@@ -204,15 +207,15 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
     textAlign: 'center',
     lineHeight: 22,
+    opacity: 0.7,
   },
   formCard: {
-    backgroundColor: 'white',
     borderRadius: 20,
     padding: 24,
     marginBottom: 24,
+    borderWidth: 1,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,

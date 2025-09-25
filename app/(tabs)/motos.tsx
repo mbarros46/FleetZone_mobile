@@ -3,6 +3,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { ThemedText, ThemedView } from '../../src/components';
 import { useAccentColor } from '../../src/styles/theme';
+import { useThemeColor } from '../../hooks/useThemeColor';
 
 const motosMock = [
   { id: '1', modelo: 'Honda CG 160', placa: 'ABC-1234', status: 'Disponível' },
@@ -23,6 +24,8 @@ const motosMock = [
 
 export default function MotosScreen() {
   const { accentColor } = useAccentColor();
+  const cardColor = useThemeColor({}, 'card');
+  const borderColor = useThemeColor({}, 'border');
 
   const getStatusIcon = (status: string) => {
     if (status === 'Disponível') return 'checkmark-circle';
@@ -48,7 +51,7 @@ export default function MotosScreen() {
         contentContainerStyle={styles.listContainer}
         renderItem={({ item }) => (
           <TouchableOpacity
-            style={styles.motoCard}
+            style={[styles.motoCard, { backgroundColor: cardColor, borderColor: borderColor }]}
             onPress={() => {
               Alert.alert(
                 `🏍️ ${item.modelo}`,
@@ -82,7 +85,7 @@ export default function MotosScreen() {
                 {item.modelo}
               </ThemedText>
               <View style={styles.placaContainer}>
-                <Ionicons name="document-text" size={16} color="#666" />
+                <Ionicons name="document-text" size={16} color={useThemeColor({}, 'icon')} />
                 <ThemedText style={styles.placaText}>
                   {item.placa}
                 </ThemedText>
@@ -130,10 +133,10 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   motoCard: {
-    backgroundColor: 'white',
     padding: 20,
     borderRadius: 16,
     marginBottom: 16,
+    borderWidth: 1,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -153,18 +156,18 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: 'rgba(10, 126, 164, 0.1)',
+    backgroundColor: 'rgba(255, 107, 53, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   statusBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f8f9fa',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
     gap: 6,
+    opacity: 0.9,
   },
   statusText: {
     fontSize: 12,

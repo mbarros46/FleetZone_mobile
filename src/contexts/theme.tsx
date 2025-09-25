@@ -46,7 +46,21 @@ export function ThemeProviderCustom({
   };
 
   const effectiveTheme = getEffectiveTheme();
-  const navTheme = effectiveTheme === 'dark' ? DarkTheme : DefaultTheme;
+  
+  // Customiza o tema escuro para ficar mais escuro
+  const customDarkTheme = {
+    ...DarkTheme,
+    colors: {
+      ...DarkTheme.colors,
+      background: '#000000',
+      card: '#111111',
+      text: '#FFFFFF',
+      border: '#333333',
+      primary: '#FF6B35',
+    },
+  };
+  
+  const navTheme = effectiveTheme === 'dark' ? customDarkTheme : DefaultTheme;
 
   return (
     <ThemeContext.Provider value={{ mode, setMode: setModePersist, navTheme, effectiveTheme }}>

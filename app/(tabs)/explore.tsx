@@ -1,8 +1,8 @@
-// explore.tsx atualizado com texto preto
 import { useState } from 'react';
 import { StyleSheet, FlatList, TextInput } from 'react-native';
 
 import { ThemedText, ThemedView } from '../../src/components';
+import { useThemeColor } from '../../hooks/useThemeColor';
 
 const dadosMockados = [
   {
@@ -33,6 +33,8 @@ const dadosMockados = [
 
 export default function ExploreScreen() {
   const [busca, setBusca] = useState('');
+  const cardColor = useThemeColor({}, 'card');
+  const borderColor = useThemeColor({}, 'border');
 
   const resultados = dadosMockados.filter(
     (item) =>
@@ -47,17 +49,17 @@ export default function ExploreScreen() {
         Explorar Motos
       </ThemedText>
       <TextInput
-        style={styles.input}
+        style={[styles.input, { backgroundColor: cardColor, borderColor: borderColor }]}
         placeholder="Buscar por modelo, local ou pátio"
         value={busca}
         onChangeText={setBusca}
-        placeholderTextColor="#888"
+        placeholderTextColor={useThemeColor({}, 'icon')}
       />
       <FlatList
         data={resultados}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <ThemedView style={styles.item}>
+          <ThemedView style={[styles.item, { backgroundColor: cardColor, borderColor: borderColor }]}>
             <ThemedText style={[styles.itemTitle, styles.darkText]}>
               {item.modelo}
             </ThemedText>
@@ -78,18 +80,17 @@ const styles = StyleSheet.create({
   container: { flex: 1, padding: 20 },
   title: { marginBottom: 20, textAlign: 'center' },
   input: {
-    backgroundColor: '#f0f0f0',
     padding: 15,
     borderRadius: 8,
     marginBottom: 20,
     fontSize: 16,
-    color: 'black',
+    borderWidth: 1,
   },
   item: {
-    backgroundColor: '#e0e0e0',
     padding: 15,
     borderRadius: 8,
     marginBottom: 10,
+    borderWidth: 1,
   },
   itemTitle: {
     fontSize: 16,

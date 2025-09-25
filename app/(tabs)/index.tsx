@@ -5,10 +5,13 @@ import { useNavigation } from '@react-navigation/native';
 
 import { ThemedText, ThemedView } from '../../src/components';
 import { useAccentColor } from '../../src/styles/theme';
+import { useThemeColor } from '../../hooks/useThemeColor';
 
 export default function HomeScreen() {
   const { accentColor } = useAccentColor();
   const navigation = useNavigation();
+  const surfaceColor = useThemeColor({}, 'surface');
+  const borderColor = useThemeColor({}, 'border');
   
   return (
     <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
@@ -29,21 +32,21 @@ export default function HomeScreen() {
 
       <ThemedView style={styles.container}>
         <ThemedView style={styles.statsContainer}>
-          <View style={styles.statCard}>
+          <ThemedView style={[styles.statCard, { backgroundColor: surfaceColor, borderColor: borderColor }]}>
             <Ionicons name="speedometer" size={24} color={accentColor} />
             <ThemedText style={styles.statNumber}>12</ThemedText>
             <ThemedText style={styles.statLabel}>Motos Ativas</ThemedText>
-          </View>
-          <View style={styles.statCard}>
+          </ThemedView>
+          <ThemedView style={[styles.statCard, { backgroundColor: surfaceColor, borderColor: borderColor }]}>
             <Ionicons name="checkmark-circle" size={24} color="#4CAF50" />
             <ThemedText style={styles.statNumber}>8</ThemedText>
             <ThemedText style={styles.statLabel}>Disponíveis</ThemedText>
-          </View>
-          <View style={styles.statCard}>
+          </ThemedView>
+          <ThemedView style={[styles.statCard, { backgroundColor: surfaceColor, borderColor: borderColor }]}>
             <Ionicons name="build" size={24} color="#FF9800" />
             <ThemedText style={styles.statNumber}>4</ThemedText>
             <ThemedText style={styles.statLabel}>Manutenção</ThemedText>
-          </View>
+          </ThemedView>
         </ThemedView>
 
         <ThemedView style={styles.buttonContainer}>
@@ -60,7 +63,7 @@ export default function HomeScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity 
-            style={styles.secondaryButton}
+            style={[styles.secondaryButton, { backgroundColor: surfaceColor, borderColor: borderColor }]}
             onPress={() => {
               // @ts-ignore
               navigation.navigate('formulario');
@@ -74,7 +77,7 @@ export default function HomeScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity 
-            style={styles.secondaryButton}
+            style={[styles.secondaryButton, { backgroundColor: surfaceColor, borderColor: borderColor }]}
             onPress={() => {
               // @ts-ignore
               navigation.navigate('configuracoes');
@@ -132,10 +135,10 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
     padding: 20,
     borderRadius: 16,
     alignItems: 'center',
+    borderWidth: 1,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -153,8 +156,8 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     fontSize: 12,
-    color: '#666',
     textAlign: 'center',
+    opacity: 0.7,
   },
   buttonContainer: {
     width: '100%',
@@ -186,9 +189,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(10, 126, 164, 0.1)',
     borderWidth: 1,
-    borderColor: 'rgba(10, 126, 164, 0.2)',
   },
   secondaryButtonText: {
     fontSize: 16,
