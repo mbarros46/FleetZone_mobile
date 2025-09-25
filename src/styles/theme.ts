@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useState, useEffect } from 'react';
 
 const COR_DESTAQUE_KEY = '@fleetzone_cor_destaque';
-const DEFAULT_ACCENT_COLOR = '#0a7ea4';
+const DEFAULT_ACCENT_COLOR = '#FF6B35'; // Laranja vibrante para motos
 
 export const useAccentColor = () => {
   const [accentColor, setAccentColor] = useState(DEFAULT_ACCENT_COLOR);

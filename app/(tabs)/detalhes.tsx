@@ -1,4 +1,3 @@
-// detalhes.tsx com busca por chave/placa da moto
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -7,11 +6,13 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
+  ScrollView,
+  View,
 } from 'react-native';
 import { z } from 'zod';
+import { Ionicons } from '@expo/vector-icons';
 
 import { ControlledInput, ThemedText, ThemedView } from '../../src/components';
-import { commonStyles } from '../../src/styles/common';
 import { useAccentColor } from '../../src/styles/theme';
 
 const buscaSchema = z.object({
@@ -54,6 +55,7 @@ export default function DetalhesScreen() {
   const {
     control,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<BuscaForm>({
     resolver: zodResolver(buscaSchema),
@@ -82,101 +84,342 @@ export default function DetalhesScreen() {
   };
 
   return (
-    <ThemedView style={styles.container}>
-      <ThemedText type="title" style={styles.title}>
-        Buscar Moto por Chave
-      </ThemedText>
-
-      <ControlledInput
-        name="placa"
-        control={control}
-        label="Placa da Moto:"
-        placeholder="Digite a placa (ABC-1234)"
-        error={errors.placa}
-        autoCapitalize="characters"
-        maxLength={8}
-      />
-
-      <TouchableOpacity
-        style={[
-          styles.button,
-          { backgroundColor: accentColor },
-          isSubmitting && styles.buttonDisabled,
-        ]}
-        onPress={handleSubmit(onSubmit)}
-        disabled={isSubmitting}
-      >
-        {isSubmitting ? (
-          <ActivityIndicator color="white" size="small" />
-        ) : (
-          <ThemedText style={styles.buttonText}>Buscar</ThemedText>
-        )}
-      </TouchableOpacity>
-
-      {motoSelecionada && (
-        <ThemedView style={styles.infoBox}>
-          <ThemedText style={styles.label}>🛵 Modelo:</ThemedText>
-          <ThemedText style={styles.value}>{motoSelecionada.modelo}</ThemedText>
-
-          <ThemedText style={styles.label}>📄 Placa:</ThemedText>
-          <ThemedText style={styles.value}>{motoSelecionada.placa}</ThemedText>
-
-          <ThemedText style={styles.label}>🏢 Pátio:</ThemedText>
-          <ThemedText style={styles.value}>{motoSelecionada.patio}</ThemedText>
-
-          <ThemedText style={styles.label}>📅 Data de Entrada:</ThemedText>
-          <ThemedText style={styles.value}>
-            {motoSelecionada.dataEntrada}
+    <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ThemedView style={styles.container}>
+        {/* Header */}
+        <View style={styles.header}>
+          <View style={styles.iconContainer}>
+            <Ionicons name="search" size={32} color="#FF6B35" />
+          </View>
+          <ThemedText type="title" style={styles.title}>
+            Buscar Motocicleta
           </ThemedText>
+          <ThemedText style={styles.subtitle}>
+            Digite a placa para visualizar os detalhes
+          </ThemedText>
+        </View>
 
-          <ThemedText style={styles.label}>🕒 Km Rodados:</ThemedText>
-          <ThemedText style={styles.value}>{motoSelecionada.km} km</ThemedText>
+        {/* Quick Search Buttons */}
+        <View style={styles.quickSearchCard}>
+          <ThemedText style={styles.quickSearchTitle}>🚀 Busca Rápida - Motos Disponíveis:</ThemedText>
+          <View style={styles.quickButtonsGrid}>
+            {motosMock.map((moto) => (
+              <TouchableOpacity
+                key={moto.placa}
+                style={styles.quickSearchButton}
+                onPress={() => {
+                  setValue('placa', moto.placa);
+                  setMotoSelecionada(moto);
+                  Alert.alert('Moto Encontrada!', `${moto.modelo} carregada com sucesso.`);
+                }}
+                activeOpacity={0.8}
+              >
+                <ThemedText style={styles.quickSearchButtonText}>{moto.placa}</ThemedText>
+                <ThemedText style={styles.quickSearchButtonModel}>{moto.modelo}</ThemedText>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
 
-          <ThemedText style={styles.label}>🧰 Status:</ThemedText>
-          <ThemedText
-            style={[styles.value, getStatusStyle(motoSelecionada.status)]}
+        {/* Search Card */}
+        <View style={styles.searchCard}>
+          <View style={styles.searchHeader}>
+            <Ionicons name="document-text" size={20} color="#FF6B35" />
+            <ThemedText style={styles.searchTitle}>Consulta por Placa</ThemedText>
+          </View>
+
+          <ControlledInput
+            name="placa"
+            control={control}
+            placeholder="Digite a placa (ABC-1234)"
+            error={errors.placa}
+            autoCapitalize="characters"
+            maxLength={8}
+          />
+
+          <TouchableOpacity
+            style={[
+              styles.searchButton,
+              { backgroundColor: accentColor },
+              isSubmitting && styles.buttonDisabled,
+            ]}
+            onPress={handleSubmit(onSubmit)}
+            disabled={isSubmitting}
+            activeOpacity={0.8}
           >
-            {motoSelecionada.status}
-          </ThemedText>
+            {isSubmitting ? (
+              <ActivityIndicator color="white" size="small" />
+            ) : (
+              <ThemedText style={styles.buttonText}>Buscar Motocicleta</ThemedText>
+            )}
+          </TouchableOpacity>
+        </View>
 
-          <ThemedText style={styles.label}>🔧 Próxima Manutenção:</ThemedText>
-          <ThemedText style={styles.value}>
-            {motoSelecionada.manutencao}
-          </ThemedText>
-        </ThemedView>
-      )}
-    </ThemedView>
+        {/* Reset Button */}
+        {motoSelecionada && (
+          <TouchableOpacity
+            style={styles.resetButton}
+            onPress={() => {
+              setMotoSelecionada(null);
+              setValue('placa', '');
+              Alert.alert('Busca Limpa', 'Você pode fazer uma nova busca agora.');
+            }}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="refresh" size={16} color="#666" />
+            <ThemedText style={styles.resetButtonText}>Nova Busca</ThemedText>
+          </TouchableOpacity>
+        )}
+
+        {/* Moto Details Card */}
+        {motoSelecionada && (
+          <View style={styles.motoCard}>
+            <View style={styles.motoHeader}>
+              <ThemedText style={styles.motoTitle}>
+                {motoSelecionada.modelo}
+              </ThemedText>
+              <View style={styles.statusBadge}>
+                <Ionicons 
+                  name={motoSelecionada.status === 'Disponível' ? 'checkmark-circle' : 
+                        motoSelecionada.status === 'Em manutenção' ? 'construct' : 'close-circle'} 
+                  size={16} 
+                  color={getStatusColor(motoSelecionada.status)}
+                />
+                <ThemedText style={[styles.statusText, { color: getStatusColor(motoSelecionada.status) }]}>
+                  {motoSelecionada.status}
+                </ThemedText>
+              </View>
+            </View>
+
+            <View style={styles.infoGrid}>
+              <View style={styles.infoRow}>
+                <ThemedText style={styles.infoLabel}>Placa</ThemedText>
+                <ThemedText style={styles.infoValue}>{motoSelecionada.placa}</ThemedText>
+              </View>
+
+              <View style={styles.infoRow}>
+                <ThemedText style={styles.infoLabel}>Pátio</ThemedText>
+                <ThemedText style={styles.infoValue}>{motoSelecionada.patio}</ThemedText>
+              </View>
+
+              <View style={styles.infoRow}>
+                <ThemedText style={styles.infoLabel}>Data de Entrada</ThemedText>
+                <ThemedText style={styles.infoValue}>
+                  {new Date(motoSelecionada.dataEntrada).toLocaleDateString('pt-BR')}
+                </ThemedText>
+              </View>
+
+              <View style={styles.infoRow}>
+                <ThemedText style={styles.infoLabel}>Quilometragem</ThemedText>
+                <ThemedText style={styles.infoValue}>{motoSelecionada.km.toLocaleString()} km</ThemedText>
+              </View>
+
+              <View style={styles.infoRow}>
+                <ThemedText style={styles.infoLabel}>Próxima Manutenção</ThemedText>
+                <ThemedText style={styles.infoValue}>
+                  {new Date(motoSelecionada.manutencao).toLocaleDateString('pt-BR')}
+                </ThemedText>
+              </View>
+            </View>
+          </View>
+        )}
+      </ThemedView>
+    </ScrollView>
   );
 }
 
-function getStatusStyle(status: string) {
-  if (status === 'Disponível') return { color: 'green' };
-  if (status === 'Em manutenção') return { color: 'orange' };
-  return { color: 'red' };
+function getStatusColor(status: string) {
+  if (status === 'Disponível') return '#4CAF50';
+  if (status === 'Em manutenção') return '#FF9800';
+  return '#F44336';
 }
 
 const styles = StyleSheet.create({
-  ...commonStyles,
+  scrollView: {
+    flex: 1,
+    backgroundColor: '#fafafa',
+  },
   container: {
-    ...commonStyles.container,
+    flex: 1,
+    paddingHorizontal: 20,
+  },
+  header: {
+    alignItems: 'center',
+    paddingTop: 40,
+    paddingBottom: 24,
+  },
+  iconContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+    backgroundColor: 'rgba(255, 107, 53, 0.1)',
   },
   title: {
-    ...commonStyles.title,
+    fontSize: 28,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+  searchCard: {
+    backgroundColor: 'white',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  searchHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 16,
+  },
+  searchTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  searchButton: {
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    marginTop: 12,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  buttonDisabled: {
+    opacity: 0.6,
+  },
+  motoCard: {
+    backgroundColor: 'white',
+    borderRadius: 16,
+    padding: 24,
+    marginBottom: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  motoHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 20,
   },
-  infoBox: {
-    backgroundColor: '#f0f0f0',
-    padding: 20,
-    borderRadius: 8,
-    gap: 10,
-  },
-  label: {
-    fontSize: 16,
+  motoTitle: {
+    fontSize: 20,
     fontWeight: 'bold',
-    color: 'black',
+    color: '#1a1a1a',
   },
-  value: {
+  statusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    backgroundColor: '#f8f9fa',
+    gap: 6,
+  },
+  statusText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  infoGrid: {
+    gap: 16,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  infoLabel: {
     fontSize: 16,
-    color: 'black',
+    color: '#666',
+    fontWeight: '500',
+  },
+  infoValue: {
+    fontSize: 16,
+    color: '#1a1a1a',
+    fontWeight: '600',
+  },
+  resetButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    backgroundColor: '#f8f9fa',
+    borderRadius: 12,
+    marginBottom: 16,
+    gap: 8,
+    borderWidth: 1,
+    borderColor: '#e1e5e9',
+  },
+  resetButtonText: {
+    fontSize: 14,
+    color: '#666',
+    fontWeight: '500',
+  },
+  quickSearchCard: {
+    backgroundColor: 'white',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  quickSearchTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 16,
+    color: '#333',
+  },
+  quickButtonsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  quickSearchButton: {
+    backgroundColor: '#f8f9fa',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#e1e5e9',
+    alignItems: 'center',
+    minWidth: 100,
+  },
+  quickSearchButtonText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#FF6B35',
+    marginBottom: 4,
+  },
+  quickSearchButtonModel: {
+    fontSize: 11,
+    color: '#666',
+    textAlign: 'center',
   },
 });

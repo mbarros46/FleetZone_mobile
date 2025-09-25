@@ -6,12 +6,14 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
+  ScrollView,
+  View,
 } from 'react-native';
 import { z } from 'zod';
+import { Ionicons } from '@expo/vector-icons';
 
 import { ControlledInput, ThemedText, ThemedView } from '../../src/components';
 import { useThemeCustom } from '../../src/contexts/theme';
-import { commonStyles } from '../../src/styles/common';
 import { useAccentColor } from '../../src/styles/theme';
 
 const configSchema = z.object({
@@ -28,7 +30,7 @@ const configSchema = z.object({
 type ConfigForm = z.infer<typeof configSchema>;
 
 export default function ConfiguracoesScreen() {
-  const { mode, setMode } = useThemeCustom();
+  const { mode, setMode, effectiveTheme } = useThemeCustom();
   const { accentColor, saveAccentColor } = useAccentColor();
 
   const {
@@ -57,99 +59,415 @@ export default function ConfiguracoesScreen() {
   };
 
   return (
-    <ThemedView style={styles.container}>
-      <ThemedText type="title" style={styles.title}>
-        Configurações
-      </ThemedText>
+    <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ThemedView style={styles.container}>
+        {/* Header */}
+        <View style={styles.header}>
+          <View style={[styles.iconContainer, { backgroundColor: `${accentColor}20` }]}>
+            <Ionicons name="settings" size={32} color={accentColor} />
+          </View>
+          <ThemedText type="title" style={styles.title}>
+            Configurações
+          </ThemedText>
+          <ThemedText style={styles.subtitle}>
+            Personalize a aparência e comportamento do app
+          </ThemedText>
+        </View>
 
-      <ThemedView style={styles.form}>
-        <ControlledInput
-          name="corDestaque"
-          control={control}
-          label="Cor de Destaque:"
-          placeholder="Digite a cor (#FF0000)"
-          error={errors.corDestaque}
-          autoCapitalize="characters"
-          maxLength={7}
-        />
+        {/* Theme Section */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Ionicons name="color-palette" size={20} color={accentColor} />
+            <ThemedText style={styles.sectionTitle}>Aparência</ThemedText>
+          </View>
 
-        <ThemedView style={styles.themeContainer}>
-          <ThemedText style={styles.label}>Tema:</ThemedText>
+          <View style={styles.card}>
+            <View style={styles.settingItem}>
+              <View style={styles.settingRow}>
+                <ThemedText style={styles.settingLabel}>Tema do App</ThemedText>
+                <View style={styles.themeStatus}>
+                  <Ionicons 
+                    name={effectiveTheme === 'dark' ? 'moon' : 'sunny'} 
+                    size={16} 
+                    color={accentColor} 
+                  />
+                  <ThemedText style={[styles.themeStatusText, { color: accentColor }]}>
+                    {effectiveTheme === 'dark' ? 'Escuro' : 'Claro'} 
+                    {mode === 'system' ? ' (Auto)' : ''}
+                  </ThemedText>
+                </View>
+              </View>
+              <View style={styles.themeOptions}>
+                <TouchableOpacity
+                  style={[
+                    styles.themeOption,
+                    mode === 'light' && [styles.themeOptionSelected, { 
+                      borderColor: accentColor,
+                      backgroundColor: `${accentColor}15`
+                    }],
+                  ]}
+                  onPress={() => {
+                    setMode('light');
+                    Alert.alert('Tema Alterado', 'Tema claro aplicado com sucesso!');
+                  }}
+                  activeOpacity={0.7}
+                >
+                  <Ionicons name="sunny" size={20} color={mode === 'light' ? accentColor : '#666'} />
+                  <ThemedText style={[
+                    styles.themeOptionText,
+                    mode === 'light' && { color: accentColor, fontWeight: '600' }
+                  ]}>
+                    Claro
+                  </ThemedText>
+                  {mode === 'light' && (
+                    <Ionicons name="checkmark-circle" size={16} color={accentColor} style={styles.checkIcon} />
+                  )}
+                </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[
-              styles.themeOption,
-              mode === 'light' && styles.themeOptionSelected,
-            ]}
-            onPress={() => setMode('light')}
-          >
-            <ThemedText style={styles.themeOptionText}>☀️ Claro</ThemedText>
-          </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.themeOption,
+                    mode === 'dark' && [styles.themeOptionSelected, { 
+                      borderColor: accentColor,
+                      backgroundColor: `${accentColor}15`
+                    }],
+                  ]}
+                  onPress={() => {
+                    setMode('dark');
+                    Alert.alert('Tema Alterado', 'Tema escuro aplicado com sucesso!');
+                  }}
+                  activeOpacity={0.7}
+                >
+                  <Ionicons name="moon" size={20} color={mode === 'dark' ? accentColor : '#666'} />
+                  <ThemedText style={[
+                    styles.themeOptionText,
+                    mode === 'dark' && { color: accentColor, fontWeight: '600' }
+                  ]}>
+                    Escuro
+                  </ThemedText>
+                  {mode === 'dark' && (
+                    <Ionicons name="checkmark-circle" size={16} color={accentColor} style={styles.checkIcon} />
+                  )}
+                </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[
-              styles.themeOption,
-              mode === 'dark' && styles.themeOptionSelected,
-            ]}
-            onPress={() => setMode('dark')}
-          >
-            <ThemedText style={styles.themeOptionText}>🌙 Escuro</ThemedText>
-          </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.themeOption,
+                    mode === 'system' && [styles.themeOptionSelected, { 
+                      borderColor: accentColor,
+                      backgroundColor: `${accentColor}15`
+                    }],
+                  ]}
+                  onPress={() => {
+                    setMode('system');
+                    Alert.alert('Tema Alterado', 'Tema automático ativado - segue o sistema!');
+                  }}
+                  activeOpacity={0.7}
+                >
+                  <Ionicons name="phone-portrait" size={20} color={mode === 'system' ? accentColor : '#666'} />
+                  <ThemedText style={[
+                    styles.themeOptionText,
+                    mode === 'system' && { color: accentColor, fontWeight: '600' }
+                  ]}>
+                    Sistema
+                  </ThemedText>
+                  {mode === 'system' && (
+                    <Ionicons name="checkmark-circle" size={16} color={accentColor} style={styles.checkIcon} />
+                  )}
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </View>
 
-          <TouchableOpacity
-            style={[
-              styles.themeOption,
-              mode === 'system' && styles.themeOptionSelected,
-            ]}
-            onPress={() => setMode('system')}
-          >
-            <ThemedText style={styles.themeOptionText}>📱 Sistema</ThemedText>
-          </TouchableOpacity>
-        </ThemedView>
+        {/* Color Section */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Ionicons name="brush" size={20} color={accentColor} />
+            <ThemedText style={styles.sectionTitle}>Cores</ThemedText>
+          </View>
 
+          <View style={styles.card}>
+            <View style={styles.settingItem}>
+              <View style={styles.colorSection}>
+                <View style={styles.colorPreview}>
+                  <View style={[styles.colorCircle, { backgroundColor: accentColor }]} />
+                  <ThemedText style={styles.colorLabel}>Cor de Destaque</ThemedText>
+                </View>
+                
+                <ControlledInput
+                  name="corDestaque"
+                  control={control}
+                  label=""
+                  placeholder="#0A7EA4"
+                  error={errors.corDestaque}
+                  autoCapitalize="characters"
+                  maxLength={7}
+                  style={styles.colorInput}
+                />
+
+                <View style={styles.colorPresets}>
+                  <ThemedText style={styles.presetsLabel}>Cores Predefinidas:</ThemedText>
+                  <View style={styles.presetsGrid}>
+                    {[
+                      { name: 'Laranja', color: '#FF6B35' },
+                      { name: 'Azul', color: '#0A7EA4' },
+                      { name: 'Verde', color: '#4CAF50' },
+                      { name: 'Roxo', color: '#9C27B0' },
+                      { name: 'Vermelho', color: '#F44336' },
+                      { name: 'Dourado', color: '#FF9800' },
+                    ].map((preset) => (
+                      <TouchableOpacity
+                        key={preset.color}
+                        style={[styles.presetButton, { backgroundColor: preset.color }]}
+                        onPress={() => {
+                          setValue('corDestaque', preset.color);
+                          saveAccentColor(preset.color);
+                          Alert.alert('Cor Alterada', `Cor ${preset.name} aplicada!`);
+                        }}
+                        activeOpacity={0.8}
+                      >
+                        <ThemedText style={styles.presetButtonText}>{preset.name}</ThemedText>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>
+
+        {/* Save Button */}
         <TouchableOpacity
           style={[
-            styles.button,
+            styles.saveButton,
             { backgroundColor: accentColor },
             isSubmitting && styles.buttonDisabled,
           ]}
           onPress={handleSubmit(onSubmit)}
           disabled={isSubmitting}
+          activeOpacity={0.8}
         >
           {isSubmitting ? (
-            <ActivityIndicator color="white" size="small" />
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator color="white" size="small" />
+              <ThemedText style={styles.buttonText}>Salvando...</ThemedText>
+            </View>
           ) : (
-            <ThemedText style={styles.buttonText}>Salvar</ThemedText>
+            <View style={styles.buttonContent}>
+              <Ionicons name="checkmark" size={20} color="white" />
+              <ThemedText style={styles.buttonText}>Salvar Alterações</ThemedText>
+            </View>
           )}
         </TouchableOpacity>
       </ThemedView>
-    </ThemedView>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  ...commonStyles,
-  label: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 10,
+  scrollView: {
+    flex: 1,
+    backgroundColor: '#fafafa',
   },
-  themeContainer: {
-    gap: 10,
+  container: {
+    flex: 1,
+    paddingHorizontal: 20,
+  },
+  header: {
+    alignItems: 'center',
+    paddingTop: 40,
+    paddingBottom: 32,
+  },
+  iconContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    lineHeight: 22,
+  },
+  section: {
+    marginBottom: 24,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 12,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  card: {
+    backgroundColor: 'white',
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  settingItem: {
+    gap: 16,
+  },
+  settingLabel: {
+    fontSize: 16,
+    fontWeight: '500',
+    marginBottom: 12,
+  },
+  settingRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  themeStatus: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: 'rgba(255, 107, 53, 0.1)',
+    borderRadius: 20,
+  },
+  themeStatusText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  checkIcon: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+  },
+  themeOptions: {
+    flexDirection: 'row',
+    gap: 12,
   },
   themeOption: {
-    padding: 15,
-    borderRadius: 8,
-    backgroundColor: '#f0f0f0',
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    backgroundColor: '#f8f9fa',
     borderWidth: 2,
     borderColor: 'transparent',
+    gap: 8,
   },
   themeOptionSelected: {
-    borderColor: '#0a7ea4',
-    backgroundColor: '#e6f3f7',
+    backgroundColor: 'rgba(10, 126, 164, 0.1)',
   },
   themeOptionText: {
-    fontSize: 16,
+    fontSize: 14,
+    fontWeight: '500',
     textAlign: 'center',
+  },
+  colorSection: {
+    gap: 16,
+  },
+  colorPreview: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  colorCircle: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: '#e1e5e9',
+  },
+  colorLabel: {
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  colorInput: {
+    borderWidth: 1,
+    borderColor: '#e1e5e9',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    fontSize: 16,
+    backgroundColor: '#f8f9fa',
+    fontFamily: 'monospace',
+  },
+  saveButton: {
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    borderRadius: 16,
+    marginTop: 8,
+    marginBottom: 32,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  buttonDisabled: {
+    opacity: 0.6,
+  },
+  buttonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  loadingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  colorPresets: {
+    marginTop: 16,
+    gap: 12,
+  },
+  presetsLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#666',
+  },
+  presetsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  presetButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+    minWidth: 60,
+    alignItems: 'center',
+  },
+  presetButtonText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: '600',
   },
 });
