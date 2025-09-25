@@ -1,5 +1,12 @@
 // Configuração base para chamadas de API
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
+// No Expo, as variáveis EXPO_PUBLIC_ são disponibilizadas automaticamente
+declare const process: {
+  env: {
+    EXPO_PUBLIC_API_URL?: string;
+  };
+};
+
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://172.20.10.3:8080';
 
 export const apiConfig = {
   baseURL: API_BASE_URL,
