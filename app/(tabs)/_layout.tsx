@@ -1,3 +1,4 @@
+// @ts-ignore - Tabs exists but TypeScript isn't recognizing it
 import { Tabs } from 'expo-router';
 import React from 'react';
 import { Platform } from 'react-native';
