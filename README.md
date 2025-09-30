@@ -1,56 +1,145 @@
-# FleetZone Mobile
+# 🚀 FleetZone Mobile
 
-Aplicativo mobile para mapeamento inteligente do pátio e gestão de motos, desenvolvido com React Native e Expo.
+## 📱 Nome do App
+**FleetZone Mobile** - Sistema de Gerenciamento de Frota de Motocicletas
 
-## Alunos
+## 🎯 Proposta + Funcionalidades
 
-- Pedro Valentim Merise – RM55556826
-- Miguel Barros Ramos – RM556652
+O FleetZone Mobile é um aplicativo desenvolvido em React Native com Expo para gerenciar frotas de motocicletas de forma eficiente e intuitiva.
 
-## Requisitos Atendidos ✅
+### ✨ Funcionalidades Principais
 
-1. **Navegação entre telas**
-   - Implementado com Expo Router.
-   - Rotas: Home, Motos, Detalhes, Formulário, Configurações.
+#### 🏠 **Dashboard Principal**
+- Visão geral da frota com estatísticas em tempo real
+- Cards informativos com status das motocicletas
+- Navegação rápida para outras seções
+- Interface com gradiente e design moderno
 
-2. **Protótipo visual funcional**
-   - Layout simples e funcional.
-   - Dados mockados usando `useState`.
+#### 🏍️ **Gerenciamento de Motos**
+- Listagem completa das motocicletas cadastradas
+- Busca por placa da motocicleta
+- Visualização de detalhes (marca, modelo, ano, status)
+- Interface responsiva com cards organizados
 
-3. **Formulário com manipulação de estado**
-   - Tela de cadastro com campos controlados (modelo e placa).
-   - Dados exibidos dinamicamente.
+#### ➕ **Cadastro de Motocicletas**
+- Formulário completo de cadastro
+- Validação de dados com React Hook Form + Zod
+- Campos: Placa, Marca, Modelo, Ano, Cor, Status
+- Feedback visual de sucesso/erro
 
-4. **Armazenamento local com AsyncStorage**
-   - Configurações (cor de destaque, modo escuro) persistidas.
-   - Dados restaurados automaticamente ao reabrir o app.
+#### ⚙️ **Configurações**
+- Alternância entre tema claro e escuro
+- Seleção de cores de destaque personalizadas
+- Configurações salvas automaticamente
+- Interface intuitiva de personalização
 
-5. **Projeto no GitHub Classroom**
-   - Repositório organizado.
-   - Este README contém todas as instruções necessárias.
+### 🛠️ **Tecnologias Utilizadas**
+- **React Native** com Expo
+- **TypeScript** para tipagem estática
+- **React Hook Form** + **Zod** para formulários
+- **Expo Linear Gradient** para efeitos visuais
+- **Expo Vector Icons** (Ionicons)
+- **Context API** para gerenciamento de estado
+- **AsyncStorage** para persistência local
 
-## Como Executar Localmente
+## 📁 Estrutura de Pastas
 
-1. Instale as dependências:
+```
+FleetZone_mobile/
+├── app/                          # Navegação principal (Expo Router)
+│   ├── (tabs)/                   # Navegação por abas
+│   │   ├── index.tsx            # Tela Home/Dashboard
+│   │   ├── motos.tsx            # Listagem de motocicletas
+│   │   ├── formulario.tsx       # Cadastro de motos
+│   │   └── configuracoes.tsx    # Configurações do app
+│   ├── _layout.tsx              # Layout principal
+│   └── +not-found.tsx           # Página 404
+├── src/                          # Código fonte
+│   ├── components/              # Componentes reutilizáveis
+│   │   ├── ThemedText.tsx       # Componente de texto com tema
+│   │   ├── ThemedView.tsx       # Componente de view com tema
+│   │   └── index.ts             # Barrel export
+│   ├── contexts/                # Contextos do React
+│   │   └── theme.tsx            # Contexto de tema personalizado
+│   ├── styles/                  # Estilos e temas
+│   │   └── theme.ts             # Sistema de cores e temas
+│   └── types/                   # Tipagens TypeScript
+│       └── index.ts             # Tipos da aplicação
+├── hooks/                       # Hooks customizados
+│   └── useThemeColor.ts         # Hook para cores do tema
+├── constants/                   # Constantes da aplicação
+│   └── Colors.ts                # Paleta de cores
+├── assets/                      # Recursos estáticos
+│   ├── images/                  # Imagens
+│   └── fonts/                   # Fontes personalizadas
+├── package.json                 # Dependências do projeto
+├── tsconfig.json               # Configuração TypeScript
+├── expo.json                   # Configuração do Expo
+└── README.md                   # Documentação do projeto
+```
 
-   ```bash
-   npm install
-   ```
+## 👥 Integrantes do Projeto
 
-2. Inicie o projeto:
+| Nome | RM | GitHub |
+|------|----|---------| 
+| [Miguel Barros] | [556653]  |
+| [NOME INTEGRANTE 2] | [556826]  |
+| [NOME INTEGRANTE 3] | [] | 
+## 🚀 Como Executar o Projeto
 
-   ```bash
-   npx expo start
-   ```
+### Pré-requisitos
+- Node.js (versão 18+)
+- npm ou yarn
+- Expo CLI
+- Dispositivo móvel com Expo Go ou emulador
 
-3. Escolha uma opção:
-   - `a` para Android
-   - `i` para iOS
-   - `w` para Web
+### Instalação
+```bash
+# Clone o repositório
+git clone [URL_DO_SEU_REPOSITORIO]
 
-## Tecnologias Utilizadas
+# Entre na pasta do projeto
+cd FleetZone_mobile
 
-- React Native + Expo
-- Expo Router
-- TypeScript
-- AsyncStorage
+# Instale as dependências
+npm install
+
+# Inicie o projeto
+npx expo start
+```
+
+### Execução
+- **📱 Android**: Pressione `a` ou escaneie o QR code com Expo Go
+- **🍎 iOS**: Pressione `i` ou escaneie o QR code com a câmera
+- **🌐 Web**: Pressione `w` para abrir no navegador
+
+## 📋 Scripts Disponíveis
+
+```bash
+npm start          # Inicia o servidor de desenvolvimento
+npm run android    # Executa no Android
+npm run ios        # Executa no iOS  
+npm run web        # Executa no navegador
+npm run lint       # Verifica padrões de código
+npm run format     # Formata o código
+```
+
+## 🎨 Características do Design
+
+- **Design System** consistente com componentes temáticos
+- **Tema Claro/Escuro** com alternância dinâmica
+- **Cores Personalizáveis** com 8 opções de destaque
+- **Interface Responsiva** adaptável a diferentes tamanhos
+- **Animações Suaves** e transições fluidas
+- **Ícones Consistentes** da biblioteca Ionicons
+
+## 📱 Capturas de Tela
+
+[Adicione aqui screenshots do seu app funcionando]
+
+## 🏆 Status do Projeto
+
+✅ **Concluído** - Todas as funcionalidades implementadas e testadas
+
+---
+
