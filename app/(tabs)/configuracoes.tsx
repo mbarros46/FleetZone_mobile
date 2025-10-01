@@ -16,6 +16,8 @@ import { ControlledInput, ThemedText, ThemedView } from '../../src/components';
 import { useThemeCustom } from '../../src/contexts/theme';
 import { useAccentColor } from '../../src/styles/theme';
 import { useThemeColor } from '../../hooks/useThemeColor';
+import { useAuth } from '../../src/contexts/auth';
+import { useTranslation } from '../../src/hooks/useTranslation';
 
 const configSchema = z.object({
   corDestaque: z
@@ -33,6 +35,8 @@ type ConfigForm = z.infer<typeof configSchema>;
 export default function ConfiguracoesScreen() {
   const { mode, setMode, effectiveTheme } = useThemeCustom();
   const { accentColor, saveAccentColor } = useAccentColor();
+  const { logout, usuario } = useAuth();
+  const { t, currentLanguage, changeLanguage, availableLanguages } = useTranslation();
 
   const {
     control,
@@ -57,6 +61,27 @@ export default function ConfiguracoesScreen() {
     } catch (error) {
       Alert.alert('Erro', 'Não foi possível salvar as configurações');
     }
+  };
+
+  const handleLogout = () => {
+    Alert.alert(
+      'Sair da Conta',
+      'Tem certeza que deseja sair da sua conta?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Sair',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await logout();
+            } catch (error) {
+              Alert.alert('Erro', 'Não foi possível fazer logout');
+            }
+          },
+        },
+      ]
+    );
   };
 
   return (
@@ -176,6 +201,97 @@ export default function ConfiguracoesScreen() {
                     <Ionicons name="checkmark-circle" size={16} color={accentColor} style={styles.checkIcon} />
                   )}
                 </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </View>
+
+        {/* Account Section */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Ionicons name="person-circle" size={20} color={accentColor} />
+            <ThemedText style={styles.sectionTitle}>Conta</ThemedText>
+          </View>
+
+          <View style={styles.card}>
+            <View style={styles.settingItem}>
+              <View style={styles.accountInfo}>
+                <View style={styles.userInfo}>
+                  <View style={[styles.userAvatar, { backgroundColor: `${accentColor}20` }]}>
+                    <Ionicons name="person" size={24} color={accentColor} />
+                  </View>
+                  <View style={styles.userDetails}>
+                    <ThemedText style={styles.userName}>{usuario?.nome || 'Usuário'}</ThemedText>
+                    <ThemedText style={styles.userEmail}>{usuario?.email || 'email@exemplo.com'}</ThemedText>
+                  </View>
+                </View>
+                
+                <TouchableOpacity
+                  style={[styles.logoutButton, { borderColor: '#FF6B35' }]}
+                  onPress={handleLogout}
+                  activeOpacity={0.7}
+                >
+                  <Ionicons name="log-out" size={20} color="#FF6B35" />
+                  <ThemedText style={[styles.logoutText, { color: '#FF6B35' }]}>
+                    Sair da Conta
+                  </ThemedText>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </View>
+
+        {/* Language Section */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Ionicons name="language" size={20} color={accentColor} />
+            <ThemedText style={styles.sectionTitle}>{t('settings.language')}</ThemedText>
+          </View>
+
+          <View style={styles.card}>
+            <View style={styles.settingItem}>
+              <View style={styles.languageSection}>
+                <View style={styles.languagePreview}>
+                  <ThemedText style={styles.languageLabel}>
+                    {t('settings.language')}
+                  </ThemedText>
+                  <View style={styles.currentLanguage}>
+                    <ThemedText style={styles.currentLanguageText}>
+                      {availableLanguages.find(lang => lang.code === currentLanguage)?.flag} {availableLanguages.find(lang => lang.code === currentLanguage)?.name}
+                    </ThemedText>
+                  </View>
+                </View>
+                
+                <View style={styles.languageOptions}>
+                  {availableLanguages.map((language) => (
+                    <TouchableOpacity
+                      key={language.code}
+                      style={[
+                        styles.languageOption,
+                        currentLanguage === language.code && [styles.languageOptionSelected, { 
+                          borderColor: accentColor,
+                          backgroundColor: `${accentColor}15`
+                        }],
+                      ]}
+                      onPress={() => {
+                        changeLanguage(language.code);
+                        Alert.alert('Idioma Alterado', `Idioma alterado para ${language.name}`);
+                      }}
+                      activeOpacity={0.7}
+                    >
+                      <ThemedText style={styles.languageFlag}>{language.flag}</ThemedText>
+                      <ThemedText style={[
+                        styles.languageName,
+                        currentLanguage === language.code && { color: accentColor, fontWeight: '600' }
+                      ]}>
+                        {language.name}
+                      </ThemedText>
+                      {currentLanguage === language.code && (
+                        <Ionicons name="checkmark-circle" size={16} color={accentColor} style={styles.checkIcon} />
+                      )}
+                    </TouchableOpacity>
+                  ))}
+                </View>
               </View>
             </View>
           </View>
@@ -470,5 +586,96 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 12,
     fontWeight: '600',
+  },
+  accountInfo: {
+    gap: 16,
+  },
+  userInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  userAvatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  userDetails: {
+    flex: 1,
+  },
+  userName: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  userEmail: {
+    fontSize: 14,
+    color: '#666',
+  },
+  logoutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    gap: 8,
+  },
+  logoutText: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  languageSection: {
+    gap: 16,
+  },
+  languagePreview: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  languageLabel: {
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  currentLanguage: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: 'rgba(10, 126, 164, 0.1)',
+    borderRadius: 20,
+  },
+  currentLanguageText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: accentColor,
+  },
+  languageOptions: {
+    gap: 8,
+  },
+  languageOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    backgroundColor: '#f8f9fa',
+    borderWidth: 2,
+    borderColor: 'transparent',
+    gap: 12,
+  },
+  languageOptionSelected: {
+    backgroundColor: 'rgba(10, 126, 164, 0.1)',
+  },
+  languageFlag: {
+    fontSize: 20,
+  },
+  languageName: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '500',
   },
 });

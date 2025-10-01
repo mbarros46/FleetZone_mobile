@@ -1,31 +1,73 @@
-import { StyleSheet, FlatList, TouchableOpacity, View, Alert } from 'react-native';
+import { useEffect, useState, useCallback } from 'react';
+import { StyleSheet, FlatList, TouchableOpacity, View, Alert, RefreshControl, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import { ThemedText, ThemedView } from '../../src/components';
 import { useAccentColor } from '../../src/styles/theme';
 import { useThemeColor } from '../../hooks/useThemeColor';
-
-const motosMock = [
-  { id: '1', modelo: 'Honda CG 160', placa: 'ABC-1234', status: 'Disponível' },
-  {
-    id: '2',
-    modelo: 'Yamaha Fazer 250',
-    placa: 'XYZ-5678',
-    status: 'Em manutenção',
-  },
-  { id: '3', modelo: 'Honda Biz 125', placa: 'DEF-9012', status: 'Disponível' },
-  {
-    id: '4',
-    modelo: 'Yamaha Crosser 150',
-    placa: 'GHI-3456',
-    status: 'Indisponível',
-  },
-];
+import { motosService, MotoDTO } from '../../src/services/motosService';
+import { useAuth } from '../../src/contexts/auth';
 
 export default function MotosScreen() {
   const { accentColor } = useAccentColor();
   const cardColor = useThemeColor({}, 'card');
   const borderColor = useThemeColor({}, 'border');
+  const textColor = useThemeColor({}, 'text');
+  const { token } = useAuth();
+
+  const [data, setData] = useState<MotoDTO[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const load = useCallback(async () => {
+    try {
+      setLoading(true);
+      const list = await motosService.list(token ?? undefined);
+      setData(list);
+    } catch (e: any) {
+      Alert.alert('Erro', e.message ?? 'Falha ao carregar motos');
+    } finally {
+      setLoading(false);
+    }
+  }, [token]);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await load();
+    setRefreshing(false);
+  }, [load]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const remove = async (id?: number) => {
+    if (!id) return;
+    Alert.alert('Excluir', 'Confirmar exclusão desta moto?', [
+      { text: 'Cancelar', style: 'cancel' },
+      {
+        text: 'Excluir',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await motosService.remove(id, token ?? undefined);
+            await load();
+          } catch (e: any) {
+            Alert.alert('Erro', e.message ?? 'Falha ao excluir');
+          }
+        },
+      },
+    ]);
+  };
+
+  if (loading) {
+    return (
+      <ThemedView style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <ActivityIndicator />
+        <ThemedText style={{ marginTop: 8 }}>Carregando motos…</ThemedText>
+      </ThemedView>
+    );
+  }
 
   const getStatusIcon = (status: string) => {
     if (status === 'Disponível') return 'checkmark-circle';
@@ -40,22 +82,23 @@ export default function MotosScreen() {
           Frota de Motocicletas
         </ThemedText>
         <ThemedText style={styles.subtitle}>
-          {motosMock.length} motos cadastradas
+          {data.length} motos cadastradas
         </ThemedText>
       </View>
       
       <FlatList
-        data={motosMock}
-        keyExtractor={(item) => item.id}
+        data={data}
+        keyExtractor={(item) => String(item.id)}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContainer}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         renderItem={({ item }) => (
           <TouchableOpacity
             style={[styles.motoCard, { backgroundColor: cardColor, borderColor: borderColor }]}
             onPress={() => {
               Alert.alert(
                 `🏍️ ${item.modelo}`,
-                `📋 Placa: ${item.placa}\n🔧 Status: ${item.status}\n\n💡 Dica: Use a aba "Detalhes" para buscar informações completas por placa!`,
+                `📋 Placa: ${item.placa}\n🔧 Status: ${item.status || 'N/A'}\n\n💡 Dica: Use a aba "Detalhes" para buscar informações completas por placa!`,
                 [
                   { text: 'Ver Detalhes', onPress: () => Alert.alert('Navegação', 'Vá para a aba "Detalhes" e digite a placa para ver informações completas.') },
                   { text: 'Fechar', style: 'cancel' }
@@ -70,12 +113,12 @@ export default function MotosScreen() {
               </View>
               <View style={styles.statusBadge}>
                 <Ionicons 
-                  name={getStatusIcon(item.status)} 
+                  name={getStatusIcon(item.status || '')} 
                   size={16} 
-                  color={getStatusColor(item.status)}
+                  color={getStatusColor(item.status || '')}
                 />
-                <ThemedText style={[styles.statusText, { color: getStatusColor(item.status) }]}>
-                  {item.status}
+                <ThemedText style={[styles.statusText, { color: getStatusColor(item.status || '') }]}>
+                  {item.status || 'N/A'}
                 </ThemedText>
               </View>
             </View>
@@ -93,11 +136,27 @@ export default function MotosScreen() {
             </View>
             
             <View style={styles.cardActions}>
-              <Ionicons name="chevron-forward" size={20} color="#ccc" />
+              <TouchableOpacity onPress={() => remove(item.id)}>
+                <Ionicons name="trash-outline" size={22} color={textColor} />
+              </TouchableOpacity>
             </View>
           </TouchableOpacity>
         )}
+        ListEmptyComponent={
+          <ThemedText style={{ textAlign: 'center', opacity: 0.7, marginTop: 24 }}>
+            Nenhuma moto cadastrada.
+          </ThemedText>
+        }
       />
+      <TouchableOpacity
+        style={[styles.fab, { backgroundColor: accentColor }]}
+        onPress={() => {
+          // navegar para o formulário (criação)
+          // em Expo Router, por ex.: router.push('/(tabs)/formulario');
+        }}
+      >
+        <Ionicons name="add" size={28} color="#fff" />
+      </TouchableOpacity>
     </ThemedView>
   );
 }
@@ -194,5 +253,16 @@ const styles = StyleSheet.create({
   },
   cardActions: {
     alignItems: 'flex-end',
+  },
+  fab: {
+    position: 'absolute',
+    right: 16,
+    bottom: 24,
+    width: 56, 
+    height: 56, 
+    borderRadius: 28,
+    alignItems: 'center', 
+    justifyContent: 'center',
+    elevation: 3,
   },
 });

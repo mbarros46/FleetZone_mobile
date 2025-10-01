@@ -14,6 +14,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { ControlledInput, ThemedText, ThemedView } from '../../src/components';
 import { useAccentColor } from '../../src/styles/theme';
 import { useThemeColor } from '../../hooks/useThemeColor';
+import { motosService } from '../../src/services/motosService';
+import { useAuth } from '../../src/contexts/auth';
 
 const motoSchema = z.object({
   modelo: z
@@ -34,6 +36,7 @@ export default function FormularioScreen() {
   const { accentColor } = useAccentColor();
   const cardColor = useThemeColor({}, 'card');
   const borderColor = useThemeColor({}, 'border');
+  const { token } = useAuth();
 
   const {
     control,
@@ -50,8 +53,11 @@ export default function FormularioScreen() {
 
   const onSubmit = async (data: MotoForm) => {
     try {
-      // Simular uma chamada de API
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await motosService.create({
+        modelo: data.modelo,
+        placa: data.placa,
+        status: 'Disponível', // status padrão
+      }, token ?? undefined);
 
       Alert.alert(
         'Moto Cadastrada!',
@@ -63,10 +69,10 @@ export default function FormularioScreen() {
           },
         ],
       );
-    } catch (error) {
+    } catch (error: any) {
       Alert.alert(
         'Erro',
-        'Não foi possível cadastrar a moto. Tente novamente.',
+        error.message ?? 'Não foi possível cadastrar a moto. Tente novamente.',
       );
     }
   };
@@ -104,10 +110,9 @@ export default function FormularioScreen() {
                 name="modelo"
                 control={control}
                 label=""
-                placeholder="Ex: Honda CG 160, Yamaha Fazer 250"
                 error={errors.modelo}
-                autoCapitalize="words"
                 style={styles.input}
+                placeholder="Ex: Honda CG 160, Yamaha Fazer 250"
               />
             </View>
 
@@ -120,11 +125,10 @@ export default function FormularioScreen() {
                 name="placa"
                 control={control}
                 label=""
-                placeholder="ABC-1234"
                 error={errors.placa}
-                autoCapitalize="characters"
                 maxLength={8}
                 style={styles.input}
+                placeholder="ABC-1234"
               />
             </View>
 

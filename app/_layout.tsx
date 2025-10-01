@@ -7,17 +7,34 @@ import { useEffect } from 'react';
 import 'react-native-reanimated';
 
 import { ThemeProviderCustom, useThemeCustom } from '../src/contexts/theme';
+import { AuthProvider, useAuth } from '../src/contexts/auth';
+import { initializeLanguage } from '../src/i18n';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 function AppNav() {
   const { navTheme } = useThemeCustom();
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return null; // ou um loading screen
+  }
+
   return (
     <ThemeProvider value={navTheme}>
       <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
+        {isAuthenticated ? (
+          <>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="+not-found" />
+          </>
+        ) : (
+          <>
+            <Stack.Screen name="auth/login" options={{ headerShown: false }} />
+            <Stack.Screen name="auth/register" options={{ headerShown: false }} />
+          </>
+        )}
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>
@@ -31,6 +48,8 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (loaded) {
+      // Inicializar idioma
+      initializeLanguage();
       SplashScreen.hideAsync();
     }
   }, [loaded]);
@@ -41,7 +60,9 @@ export default function RootLayout() {
 
   return (
     <ThemeProviderCustom>
-      <AppNav />
+      <AuthProvider>
+        <AppNav />
+      </AuthProvider>
     </ThemeProviderCustom>
   );
 }

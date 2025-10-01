@@ -26,6 +26,14 @@ const ConfigIcon = ({ color }: { color: string }) => (
   <IconSymbol size={28} name="gear" color={color} />
 );
 
+const SobreIcon = ({ color }: { color: string }) => (
+  <IconSymbol size={28} name="info.circle" color={color} />
+);
+
+const NotificationsIcon = ({ color }: { color: string }) => (
+  <IconSymbol size={28} name="bell" color={color} />
+);
+
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
@@ -71,6 +79,20 @@ export default function TabLayout() {
         options={{
           title: 'Config',
           tabBarIcon: ConfigIcon,
+        }}
+      />
+      <Tabs.Screen
+        name="notificacoes"
+        options={{
+          title: 'Notificações',
+          tabBarIcon: NotificationsIcon,
+        }}
+      />
+      <Tabs.Screen
+        name="sobre"
+        options={{
+          title: 'Sobre',
+          tabBarIcon: SobreIcon,
         }}
       />
     </Tabs>
