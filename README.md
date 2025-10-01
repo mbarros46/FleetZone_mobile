@@ -1,48 +1,136 @@
-# FleetZone Mobile 🏍️
+# 🏍️ FleetZone Mobile
 
-Sistema móvel de gestão de frotas de motocicletas desenvolvido com React Native e Expo.
+<div align="center">
+  <img src="./assets/images/icon.png" alt="FleetZone Logo" width="120" height="120" />
+  
+  [![React Native](https://img.shields.io/badge/React%20Native-0.75.4-blue.svg)](https://reactnative.dev/)
+  [![Expo](https://img.shields.io/badge/Expo-54.0.10-black.svg)](https://expo.dev/)
+  [![TypeScript](https://img.shields.io/badge/TypeScript-5.3.3-blue.svg)](https://www.typescriptlang.org/)
+  [![License](https://img.shields.io/badge/License-Academic-green.svg)]()
+</div>
 
 ## 📱 Sobre o Projeto
 
-O FleetZone Mobile é uma aplicação desenvolvida como projeto acadêmico que oferece uma solução completa para gerenciamento de frotas de motocicletas, incluindo controle de motos, pátios e usuários.
+**FleetZone Mobile** é um aplicativo React Native desenvolvido para gerenciamento de frotas de motocicletas. O sistema permite controle completo de motos, pátios, usuários e notificações, oferecendo uma interface moderna e intuitiva seguindo os padrões do Material Design 3.
 
-### ✨ Funcionalidades Principais
+### 🎯 Funcionalidades Principais
 
-- **🔐 Sistema de Autenticação Completo**
-  - Login e registro de usuários
-  - Persistência de sessão com AsyncStorage
-  - Logout seguro
+- 🔐 **Sistema de Autenticação Completo** - Login, registro e logout seguros
+- 🏍️ **Gestão de Motocicletas** - CRUD completo com validações
+- 🏢 **Controle de Pátios** - Gerenciamento de locais de armazenamento
+- 🔔 **Notificações Push** - Sistema integrado de notificações
+- 🌍 **Internacionalização** - Suporte a Português e Espanhol
+- 🎨 **Temas Personalizáveis** - Modo claro e escuro
+- 📱 **Design Responsivo** - Interface adaptável para diferentes dispositivos
+- 🔄 **Sincronização Offline** - Dados persistentes com AsyncStorage
 
-- **🏍️ Gerenciamento de Motos**
-  - Cadastro completo de motocicletas
-  - Edição e exclusão de registros
-  - Listagem com busca e filtros
-  - Validação de formulários
+## 🚀 Tecnologias Utilizadas
 
-- **🏢 Controle de Pátios**
-  - Cadastro de locais de estacionamento
-  - Gestão de capacidade e localização
-  - Interface intuitiva de CRUD
+### Core
+- **React Native** 0.75.4 - Framework principal
+- **Expo** 54.0.10 - Plataforma de desenvolvimento
+- **TypeScript** 5.3.3 - Tipagem estática
+- **React Navigation** 6.x - Navegação entre telas
 
-- **📊 Dashboard Inteligente**
-  - Estatísticas em tempo real
-  - Contadores de motos e pátios
-  - Ações rápidas
-  - Saudação personalizada
+### Gerenciamento de Estado
+- **React Context API** - Estado global da aplicação
+- **AsyncStorage** - Persistência de dados local
 
-- **🎨 Sistema de Temas**
-  - Modo claro e escuro
-  - Modo automático (sistema)
-  - Cor de destaque personalizável
-  - Interface adaptiva
+### UI/UX
+- **Material Design 3** - Sistema de design moderno
+- **Expo Vector Icons** - Ícones vetoriais
+- **React Native Reanimated** - Animações fluidas
 
-- **⚙️ Configurações Avançadas**
-  - Troca de tema
-  - Informações do usuário
-  - Sobre o aplicativo
-  - Logout seguro
+### Backend Integration
+- **Axios** - Cliente HTTP para APIs
+- **JWT** - Autenticação por tokens
 
-## 🏗️ Arquitetura
+### Desenvolvimento
+- **ESLint** - Análise de código
+- **Prettier** - Formatação de código
+- **Jest** - Testes unitários
+
+## 📦 Instalação e Configuração
+
+### Pré-requisitos
+
+- Node.js 18.x ou superior
+- npm ou yarn
+- Expo CLI
+- Android Studio (para Android)
+- Xcode (para iOS - apenas macOS)
+
+### 1. Clone o Repositório
+
+```bash
+git clone https://github.com/seu-usuario/fleetzone-mobile.git
+cd fleetzone-mobile
+```
+
+### 2. Instale as Dependências
+
+```bash
+npm install
+# ou
+yarn install
+```
+
+### 3. Configure as Variáveis de Ambiente
+
+Copie o arquivo de exemplo e configure suas variáveis:
+
+```bash
+cp env.example .env
+```
+
+Edite o arquivo `.env` com suas configurações:
+
+```env
+API_BASE_URL=https://sua-api.com/api
+EXPO_PUBLIC_API_URL=https://sua-api.com/api
+```
+
+### 4. Execute o Projeto
+
+```bash
+# Desenvolvimento
+npm start
+
+# Android
+npm run android
+
+# iOS
+npm run ios
+
+# Web
+npm run web
+```
+
+## 🏗️ Arquitetura do Projeto
+
+```
+src/
+├── components/          # Componentes reutilizáveis
+│   ├── ControlledInput.tsx
+│   ├── ThemedText.tsx
+│   └── ThemedView.tsx
+├── contexts/           # Contextos do React
+│   ├── auth.tsx       # Autenticação
+│   ├── theme.tsx      # Temas
+│   └── notifications.tsx
+├── features/          # Funcionalidades por domínio
+│   ├── auth/         # Autenticação
+│   ├── motos/        # Gestão de motos
+│   └── patios/       # Gestão de pátios
+├── hooks/            # Hooks customizados
+├── i18n/             # Internacionalização
+├── services/         # Serviços de API
+├── styles/           # Estilos e temas
+│   ├── materialDesign.ts
+│   ├── theme.ts
+│   └── tokens.ts
+└── mocks/            # Dados de exemplo
+```
 
 ### 📁 Estrutura de Pastas
 
