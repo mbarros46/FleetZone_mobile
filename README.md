@@ -197,11 +197,10 @@ FleetZone_mobile/
 
 ## � Equipe do Projeto
 
-| Nome | RM | Função |
-|------|----|---------| 
-| Miguel Barros | 556653 | Desenvolvedor Full-Stack |
-| [NOME INTEGRANTE 2] | [RM] | [FUNÇÃO] |
-| [NOME INTEGRANTE 3] | [RM] | [FUNÇÃO] |
+- Miguel Barros Ramos (RM556652)
+- Pedro Valentim Merise (RM556826)
+- Thomas Rodrigues (558042)
+
    ```env
    EXPO_PUBLIC_API_URL=http://localhost:8080
    ```
