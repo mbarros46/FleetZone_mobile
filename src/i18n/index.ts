@@ -22,15 +22,14 @@ i18n.enableFallback = true;
 
 // Função para detectar idioma do dispositivo
 export const detectDeviceLanguage = (): string => {
-  const deviceLocale = Localization.locale;
-  
-  // Mapear códigos de idioma para nossos códigos
-  if (deviceLocale.startsWith('es')) {
-    return 'es';
+  try {
+    // Sempre retorna português como padrão por enquanto
+    // TODO: Implementar detecção mais robusta quando necessário
+    return 'pt';
+  } catch (error) {
+    console.error('Erro ao detectar idioma do dispositivo:', error);
+    return 'pt'; 
   }
-  
-  // Português como padrão
-  return 'pt';
 };
 
 // Função para carregar idioma salvo

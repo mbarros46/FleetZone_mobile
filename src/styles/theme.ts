@@ -5,7 +5,7 @@ const COR_DESTAQUE_KEY = '@fleetzone_cor_destaque';
 const DEFAULT_ACCENT_COLOR = '#FF6B35'; // Laranja vibrante para motos
 
 export const useAccentColor = () => {
-  const [accentColor, setAccentColor] = useState(DEFAULT_ACCENT_COLOR);
+  const [accentColor, setAccentColor] = useState<string>(DEFAULT_ACCENT_COLOR);
 
   useEffect(() => {
     loadAccentColor();
@@ -19,6 +19,8 @@ export const useAccentColor = () => {
       }
     } catch (error) {
       console.log('Erro ao carregar cor de destaque:', error);
+      // Garantir que sempre há uma cor padrão
+      setAccentColor(DEFAULT_ACCENT_COLOR);
     }
   };
 
@@ -31,7 +33,7 @@ export const useAccentColor = () => {
     }
   };
 
-  return { accentColor, saveAccentColor };
+  return { accentColor: accentColor || DEFAULT_ACCENT_COLOR, saveAccentColor };
 };
 
 export const getThemeWithAccent = (accentColor: string) => ({
