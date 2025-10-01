@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
 import { notificationsService, NotificationToken } from '../services/notificationsService';
@@ -68,7 +68,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
   };
 
   // Adiciona nova notificação
-  const addNotification = async (notification: Notifications.Notification) => {
+  const addNotification = useCallback(async (notification: Notifications.Notification) => {
     const newNotification: StoredNotification = {
       id: notification.request.identifier,
       title: notification.request.content.title || 'FleetZone',
@@ -78,9 +78,16 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
       read: false,
     };
 
-    const updatedNotifications = [newNotification, ...notifications];
-    await saveNotifications(updatedNotifications);
-  };
+    setNotifications(prev => {
+      const updatedNotifications = [newNotification, ...prev];
+      // Salva no AsyncStorage de forma assíncrona
+      AsyncStorage.setItem(NOTIFICATIONS_STORAGE_KEY, JSON.stringify(updatedNotifications))
+        .catch(error => console.error('Erro ao salvar notificações:', error));
+      return updatedNotifications;
+    });
+    
+    setHasUnreadNotifications(true);
+  }, []);
 
   // Inicializa as notificações
   const initializeNotifications = async () => {
@@ -106,18 +113,6 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
         // Envia token para o servidor (mock endpoint)
         await sendToServer(tokenResult.token);
       }
-
-      // Configura listeners
-      const notificationListener = notificationsService.addNotificationReceivedListener(addNotification);
-      const responseListener = notificationsService.addNotificationResponseReceivedListener((response) => {
-        // Quando usuário toca na notificação, marca como lida
-        markAsRead(response.notification.request.identifier);
-      });
-
-      return () => {
-        notificationsService.removeNotificationSubscription(notificationListener);
-        notificationsService.removeNotificationSubscription(responseListener);
-      };
     } catch (error) {
       console.error('Erro ao inicializar notificações:', error);
     } finally {
@@ -153,14 +148,24 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
   };
 
   // Marca notificação como lida
-  const markAsRead = async (notificationId: string) => {
-    const updatedNotifications = notifications.map(notification =>
-      notification.id === notificationId
-        ? { ...notification, read: true }
-        : notification
-    );
-    await saveNotifications(updatedNotifications);
-  };
+  const markAsRead = useCallback(async (notificationId: string) => {
+    setNotifications(prev => {
+      const updatedNotifications = prev.map(notification =>
+        notification.id === notificationId
+          ? { ...notification, read: true }
+          : notification
+      );
+      
+      // Salva no AsyncStorage de forma assíncrona
+      AsyncStorage.setItem(NOTIFICATIONS_STORAGE_KEY, JSON.stringify(updatedNotifications))
+        .catch(error => console.error('Erro ao salvar notificações:', error));
+      
+      // Atualiza o estado de notificações não lidas
+      setHasUnreadNotifications(updatedNotifications.some(n => !n.read));
+      
+      return updatedNotifications;
+    });
+  }, []);
 
   // Marca todas como lidas
   const markAllAsRead = async () => {
@@ -188,7 +193,30 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
   };
 
   useEffect(() => {
-    initializeNotifications();
+    let notificationListener: any;
+    let responseListener: any;
+
+    const setupNotifications = async () => {
+      await initializeNotifications();
+      
+      // Configura listeners após a inicialização
+      notificationListener = notificationsService.addNotificationReceivedListener(addNotification);
+      responseListener = notificationsService.addNotificationResponseReceivedListener((response) => {
+        markAsRead(response.notification.request.identifier);
+      });
+    };
+
+    setupNotifications();
+
+    // Cleanup function
+    return () => {
+      if (notificationListener) {
+        notificationsService.removeNotificationSubscription(notificationListener);
+      }
+      if (responseListener) {
+        notificationsService.removeNotificationSubscription(responseListener);
+      }
+    };
   }, []);
 
   return (
