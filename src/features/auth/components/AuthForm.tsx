@@ -7,12 +7,13 @@ import {
   View,
   KeyboardAvoidingView,
   Platform,
+  TextInput,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-import { ControlledInput, ThemedText, ThemedView } from '../../../components';
+import { ThemedText, ThemedView } from '../../../components';
 import { useAccentColor } from '../../../styles/theme';
-import { useThemeColor } from '../../../hooks/useThemeColor';
+import { MaterialColors, MaterialComponents, MaterialTypography } from '../../../styles/materialDesign';
 
 interface AuthFormProps {
   type: 'login' | 'register';
@@ -23,8 +24,6 @@ interface AuthFormProps {
 
 export function AuthForm({ type, onSubmit, onNavigate, loading = false }: AuthFormProps) {
   const { accentColor } = useAccentColor();
-  const cardColor = useThemeColor({}, 'card');
-  const borderColor = useThemeColor({}, 'border');
 
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
@@ -34,10 +33,21 @@ export function AuthForm({ type, onSubmit, onNavigate, loading = false }: AuthFo
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+
   const validateForm = () => {
     if (type === 'register') {
       if (!nome.trim() || !email.trim() || !senha.trim() || !confirmarSenha.trim()) {
         Alert.alert('Erro', 'Por favor, preencha todos os campos');
+        return false;
+      }
+
+      if (nome.length < 2) {
+        Alert.alert('Erro', 'Nome deve ter pelo menos 2 caracteres');
+        return false;
+      }
+
+      if (!email.includes('@') || !email.includes('.')) {
+        Alert.alert('Erro', 'Email deve ter um formato válido');
         return false;
       }
 
@@ -90,10 +100,10 @@ export function AuthForm({ type, onSubmit, onNavigate, loading = false }: AuthFo
       style={styles.container} 
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <ThemedView style={[styles.formCard, { backgroundColor: cardColor, borderColor: borderColor }]}>
+      <ThemedView style={[MaterialComponents.elevatedCard, styles.formCard]}>
         <View style={styles.formHeader}>
-          <Ionicons name={isLogin ? "person" : "person-add"} size={20} color={accentColor} />
-          <ThemedText style={styles.formTitle}>
+          <Ionicons name={isLogin ? "person" : "person-add"} size={24} color={MaterialColors.primary} />
+          <ThemedText style={[MaterialTypography.titleMedium, styles.formTitle]}>
             {isLogin ? 'Dados de Acesso' : 'Dados Pessoais'}
           </ThemedText>
         </View>
@@ -101,17 +111,15 @@ export function AuthForm({ type, onSubmit, onNavigate, loading = false }: AuthFo
         <View style={styles.form}>
           {!isLogin && (
             <View style={styles.inputSection}>
-              <View style={styles.inputHeader}>
-                <Ionicons name="person" size={16} color="#666" />
-                <ThemedText style={styles.inputLabel}>Nome Completo</ThemedText>
-              </View>
-              <ControlledInput
-                name="nome"
-                control={{ field: { onChange: setNome, value: nome } } as any}
-                label=""
-                error={null}
-                style={styles.input}
+              <ThemedText style={[MaterialTypography.labelMedium, styles.inputLabel]}>
+                Nome Completo
+              </ThemedText>
+              <TextInput
+                value={nome}
+                onChangeText={setNome}
+                style={[MaterialComponents.textInput, styles.input]}
                 placeholder="Seu nome completo"
+                placeholderTextColor={MaterialColors.onSurfaceVariant}
                 autoCapitalize="words"
                 autoCorrect={false}
               />
@@ -119,17 +127,15 @@ export function AuthForm({ type, onSubmit, onNavigate, loading = false }: AuthFo
           )}
 
           <View style={styles.inputSection}>
-            <View style={styles.inputHeader}>
-              <Ionicons name="mail" size={16} color="#666" />
-              <ThemedText style={styles.inputLabel}>E-mail</ThemedText>
-            </View>
-            <ControlledInput
-              name="email"
-              control={{ field: { onChange: setEmail, value: email } } as any}
-              label=""
-              error={null}
-              style={styles.input}
+            <ThemedText style={[MaterialTypography.labelMedium, styles.inputLabel]}>
+              E-mail
+            </ThemedText>
+            <TextInput
+              value={email}
+              onChangeText={setEmail}
+              style={[MaterialComponents.textInput, styles.input]}
               placeholder="seu@email.com"
+              placeholderTextColor={MaterialColors.onSurfaceVariant}
               keyboardType="email-address"
               autoCapitalize="none"
               autoCorrect={false}
@@ -137,18 +143,16 @@ export function AuthForm({ type, onSubmit, onNavigate, loading = false }: AuthFo
           </View>
 
           <View style={styles.inputSection}>
-            <View style={styles.inputHeader}>
-              <Ionicons name="lock-closed" size={16} color="#666" />
-              <ThemedText style={styles.inputLabel}>Senha</ThemedText>
-            </View>
+            <ThemedText style={[MaterialTypography.labelMedium, styles.inputLabel]}>
+              Senha
+            </ThemedText>
             <View style={styles.passwordContainer}>
-              <ControlledInput
-                name="senha"
-                control={{ field: { onChange: setSenha, value: senha } } as any}
-                label=""
-                error={null}
-                style={[styles.input, styles.passwordInput]}
+              <TextInput
+                value={senha}
+                onChangeText={setSenha}
+                style={[MaterialComponents.textInput, styles.input, styles.passwordInput]}
                 placeholder={isLogin ? "Sua senha" : "Mínimo 6 caracteres"}
+                placeholderTextColor={MaterialColors.onSurfaceVariant}
                 secureTextEntry={!showPassword}
                 autoCapitalize="none"
                 autoCorrect={false}
@@ -159,8 +163,8 @@ export function AuthForm({ type, onSubmit, onNavigate, loading = false }: AuthFo
               >
                 <Ionicons 
                   name={showPassword ? "eye-off" : "eye"} 
-                  size={20} 
-                  color="#666" 
+                  size={24} 
+                  color={MaterialColors.onSurfaceVariant} 
                 />
               </TouchableOpacity>
             </View>
@@ -168,18 +172,16 @@ export function AuthForm({ type, onSubmit, onNavigate, loading = false }: AuthFo
 
           {!isLogin && (
             <View style={styles.inputSection}>
-              <View style={styles.inputHeader}>
-                <Ionicons name="lock-closed" size={16} color="#666" />
-                <ThemedText style={styles.inputLabel}>Confirmar Senha</ThemedText>
-              </View>
+              <ThemedText style={[MaterialTypography.labelMedium, styles.inputLabel]}>
+                Confirmar Senha
+              </ThemedText>
               <View style={styles.passwordContainer}>
-                <ControlledInput
-                  name="confirmarSenha"
-                  control={{ field: { onChange: setConfirmarSenha, value: confirmarSenha } } as any}
-                  label=""
-                  error={null}
-                  style={[styles.input, styles.passwordInput]}
+                <TextInput
+                  value={confirmarSenha}
+                  onChangeText={setConfirmarSenha}
+                  style={[MaterialComponents.textInput, styles.input, styles.passwordInput]}
                   placeholder="Digite a senha novamente"
+                  placeholderTextColor={MaterialColors.onSurfaceVariant}
                   secureTextEntry={!showConfirmPassword}
                   autoCapitalize="none"
                   autoCorrect={false}
@@ -190,8 +192,8 @@ export function AuthForm({ type, onSubmit, onNavigate, loading = false }: AuthFo
                 >
                   <Ionicons 
                     name={showConfirmPassword ? "eye-off" : "eye"} 
-                    size={20} 
-                    color="#666" 
+                    size={24} 
+                    color={MaterialColors.onSurfaceVariant} 
                   />
                 </TouchableOpacity>
               </View>
@@ -200,8 +202,8 @@ export function AuthForm({ type, onSubmit, onNavigate, loading = false }: AuthFo
 
           <TouchableOpacity
             style={[
+              MaterialComponents.filledButton,
               styles.submitButton,
-              { backgroundColor: accentColor },
               (isLoading || loading) && styles.buttonDisabled,
             ]}
             onPress={handleSubmit}
@@ -210,15 +212,15 @@ export function AuthForm({ type, onSubmit, onNavigate, loading = false }: AuthFo
           >
             {isLoading || loading ? (
               <View style={styles.loadingContainer}>
-                <ActivityIndicator color="white" size="small" />
-                <ThemedText style={styles.buttonText}>
+                <ActivityIndicator color={MaterialColors.onPrimary} size="small" />
+                <ThemedText style={[MaterialComponents.filledButtonText, styles.buttonText]}>
                   {isLogin ? 'Entrando...' : 'Criando conta...'}
                 </ThemedText>
               </View>
             ) : (
               <View style={styles.buttonContent}>
-                <Ionicons name={isLogin ? "log-in" : "person-add"} size={20} color="white" />
-                <ThemedText style={styles.buttonText}>
+                <Ionicons name={isLogin ? "log-in" : "person-add"} size={20} color={MaterialColors.onPrimary} />
+                <ThemedText style={[MaterialComponents.filledButtonText, styles.buttonText]}>
                   {isLogin ? 'Entrar' : 'Criar Conta'}
                 </ThemedText>
               </View>
@@ -226,11 +228,11 @@ export function AuthForm({ type, onSubmit, onNavigate, loading = false }: AuthFo
           </TouchableOpacity>
 
           <View style={styles.navigationSection}>
-            <ThemedText style={styles.navigationText}>
+            <ThemedText style={[MaterialTypography.bodyMedium, styles.navigationText]}>
               {isLogin ? 'Não tem uma conta? ' : 'Já tem uma conta? '}
             </ThemedText>
             <TouchableOpacity onPress={onNavigate}>
-              <ThemedText style={[styles.navigationLink, { color: accentColor }]}>
+              <ThemedText style={[MaterialTypography.labelLarge, styles.navigationLink, { color: MaterialColors.primary }]}>
                 {isLogin ? 'Cadastre-se' : 'Faça login'}
               </ThemedText>
             </TouchableOpacity>
@@ -246,29 +248,17 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   formCard: {
-    marginHorizontal: 20,
-    borderRadius: 20,
-    padding: 24,
+    marginHorizontal: 24,
     marginBottom: 24,
-    borderWidth: 1,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
   },
   formHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 24,
-    gap: 8,
+    gap: 12,
   },
   formTitle: {
-    fontSize: 18,
-    fontWeight: '600',
+    color: MaterialColors.onSurface,
   },
   form: {
     gap: 20,
@@ -276,26 +266,12 @@ const styles = StyleSheet.create({
   inputSection: {
     gap: 8,
   },
-  inputHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
+  inputLabel: {
+    color: MaterialColors.onSurface,
     marginBottom: 4,
   },
-  inputLabel: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#333',
-  },
   input: {
-    borderWidth: 1,
-    borderColor: '#e1e5e9',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    fontSize: 16,
-    backgroundColor: '#f8f9fa',
-    color: '#1a1a1a',
+    color: MaterialColors.onSurface,
   },
   passwordContainer: {
     position: 'relative',
@@ -306,31 +282,15 @@ const styles = StyleSheet.create({
   eyeButton: {
     position: 'absolute',
     right: 16,
-    top: 14,
+    top: 16,
     padding: 4,
   },
   submitButton: {
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 16,
-    marginTop: 8,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 5,
+    marginTop: 12,
+    marginBottom: 16,
   },
   buttonDisabled: {
     opacity: 0.6,
-  },
-  buttonContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
   },
   loadingContainer: {
     flexDirection: 'row',
@@ -338,23 +298,26 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
   },
-  buttonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  navigationSection: {
+  buttonContent: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 16,
+    gap: 8,
+  },
+  buttonText: {
+    marginLeft: 0,
+  },
+  navigationSection: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 4,
   },
   navigationText: {
-    fontSize: 14,
-    color: '#666',
+    color: MaterialColors.onSurfaceVariant,
   },
   navigationLink: {
-    fontSize: 14,
-    fontWeight: '600',
+    textDecorationLine: 'underline',
   },
 });
