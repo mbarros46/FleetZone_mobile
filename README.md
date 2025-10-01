@@ -78,14 +78,13 @@ FleetZone_mobile/
 └── README.md                   # Documentação do projeto
 ```
 
-## 👥 Integrantes do Projeto
+## 👨‍💻 Desenvolvido por
 
-| Nome | RM | GitHub |
-|------|----|---------| 
-| [Miguel Barros] | [556653]  |
-| [NOME INTEGRANTE 2] | [556826]  |
-| [NOME INTEGRANTE 3] | [] | 
+- Miguel Barros Ramos (RM556652)
+- Pedro Valentim Merise (RM556826)
+- Thomas Rodrigues (558042)
 ## 🚀 Como Executar o Projeto
+
 
 ### Pré-requisitos
 - Node.js (versão 18+)

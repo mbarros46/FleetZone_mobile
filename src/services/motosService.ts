@@ -1,97 +1,57 @@
-import { Moto } from './api';
+import { apiConfig, authenticatedFetch } from './api';
 
-// Mock de dados para desenvolvimento
-const motosMock: Moto[] = [
-  {
-    id: '1',
-    modelo: 'Honda CG 160',
-    placa: 'ABC-1234',
-    status: 'Disponível',
-    dataEntrada: '2025-04-10',
-    patio: 'Pátio A',
-    km: 15320,
-    manutencao: '2025-05-15',
-  },
-  {
-    id: '2',
-    modelo: 'Yamaha Fazer 250',
-    placa: 'XYZ-5678',
-    status: 'Em manutenção',
-    dataEntrada: '2025-04-12',
-    patio: 'Pátio B',
-    km: 24800,
-    manutencao: '2025-06-01',
-  },
-  {
-    id: '3',
-    modelo: 'Honda Biz 125',
-    placa: 'DEF-9012',
-    status: 'Disponível',
-    dataEntrada: '2025-04-15',
-    patio: 'Pátio A',
-    km: 8750,
-    manutencao: '2025-07-01',
-  },
-  {
-    id: '4',
-    modelo: 'Yamaha Crosser 150',
-    placa: 'GHI-3456',
-    status: 'Indisponível',
-    dataEntrada: '2025-04-08',
-    patio: 'Pátio C',
-    km: 32100,
-    manutencao: '2025-04-20',
-  },
-];
+export interface MotoDTO {
+  id?: number;
+  modelo: string;
+  placa: string;
+  status?: string;
+  patioId?: number;
+}
 
-// Simulação de delay de rede
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+const base = `${apiConfig.baseURL}/api/motos`;
 
 export const motosService = {
-  // Listar todas as motos
-  async getAll(): Promise<Moto[]> {
-    await delay(1000);
-    return motosMock;
+  async list(token?: string): Promise<MotoDTO[]> {
+    const r = await authenticatedFetch(base, { method: 'GET' }, token);
+    return r.json();
   },
-
-  // Buscar moto por placa
-  async getByPlaca(placa: string): Promise<Moto | null> {
-    await delay(800);
-    const moto = motosMock.find(
-      (m) => m.placa.toLowerCase() === placa.toLowerCase(),
+  async get(id: number, token?: string): Promise<MotoDTO> {
+    const r = await authenticatedFetch(`${base}/${id}`, { method: 'GET' }, token);
+    return r.json();
+  },
+  async create(data: MotoDTO, token?: string): Promise<MotoDTO> {
+    const r = await authenticatedFetch(
+      base,
+      {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: { 'Content-Type': 'application/json' },
+      },
+      token,
     );
-    return moto || null;
+    return r.json();
   },
-
-  // Cadastrar nova moto
-  async create(moto: Omit<Moto, 'id'>): Promise<Moto> {
-    await delay(1500);
-    const newMoto: Moto = {
-      ...moto,
-      id: Date.now().toString(),
-    };
-    motosMock.push(newMoto);
-    return newMoto;
+  async update(id: number, data: MotoDTO, token?: string): Promise<MotoDTO> {
+    const r = await authenticatedFetch(
+      `${base}/${id}`,
+      {
+        method: 'PUT',
+        body: JSON.stringify(data),
+        headers: { 'Content-Type': 'application/json' },
+      },
+      token,
+    );
+    return r.json();
   },
-
-  // Atualizar moto
-  async update(id: string, moto: Partial<Moto>): Promise<Moto> {
-    await delay(1200);
-    const index = motosMock.findIndex((m) => m.id === id);
-    if (index === -1) {
-      throw new Error('Moto não encontrada');
-    }
-    motosMock[index] = { ...motosMock[index], ...moto };
-    return motosMock[index];
+  async move(id: number, patioId: number, token?: string): Promise<MotoDTO> {
+    const r = await authenticatedFetch(
+      `${base}/${id}/mover?patioId=${patioId}`,
+      { method: 'PUT' },
+      token,
+    );
+    return r.json();
   },
-
-  // Deletar moto
-  async delete(id: string): Promise<void> {
-    await delay(800);
-    const index = motosMock.findIndex((m) => m.id === id);
-    if (index === -1) {
-      throw new Error('Moto não encontrada');
-    }
-    motosMock.splice(index, 1);
+  async remove(id: number, token?: string): Promise<void> {
+    await authenticatedFetch(`${base}/${id}`, { method: 'DELETE' }, token);
   },
 };

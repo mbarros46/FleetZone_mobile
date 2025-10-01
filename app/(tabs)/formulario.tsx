@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { useEffect, useState } from 'react';
 import {
   StyleSheet,
   TouchableOpacity,
@@ -8,12 +8,16 @@ import {
   ScrollView,
   View,
 } from 'react-native';
+import { useForm, type SubmitHandler, type Resolver } from 'react-hook-form';
 import { z } from 'zod';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 
 import { ControlledInput, ThemedText, ThemedView } from '../../src/components';
 import { useAccentColor } from '../../src/styles/theme';
 import { useThemeColor } from '../../hooks/useThemeColor';
+import { motosService } from '../../src/services/motosService';
+import { useAuth } from '../../src/contexts/auth';
 
 const motoSchema = z.object({
   modelo: z
@@ -24,70 +28,132 @@ const motoSchema = z.object({
   placa: z
     .string()
     .min(1, 'Placa é obrigatória')
-    .regex(/^[A-Z]{3}-\d{4}$/, 'Placa deve seguir o formato ABC-1234')
-    .toUpperCase(),
+    .regex(/^[A-Z]{3}-\d{4}$/i, 'Placa deve seguir o formato ABC-1234')
+    .transform((s) => s.toUpperCase()),
+  status: z
+    .string()
+    .max(50, 'Status deve ter no máximo 50 caracteres')
+    .optional()
+    .transform((value) => (value?.trim() ? value.trim() : undefined)),
 });
 
 type MotoForm = z.infer<typeof motoSchema>;
+type FormularioRouteParams = { id?: string } | undefined;
 
 export default function FormularioScreen() {
   const { accentColor } = useAccentColor();
   const cardColor = useThemeColor({}, 'card');
   const borderColor = useThemeColor({}, 'border');
+  const { token } = useAuth();
+
+  const navigation = useNavigation();
+  const route = useRoute<RouteProp<Record<string, FormularioRouteParams>, string>>();
+  const params = (route.params as FormularioRouteParams) ?? {};
+  const editingId =
+    typeof params?.id === 'string' && /^\d+$/.test(params.id) ? Number(params.id) : undefined;
 
   const {
     control,
     handleSubmit,
     reset,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<MotoForm>({
-    resolver: zodResolver(motoSchema),
+    resolver: zodResolver(motoSchema) as Resolver<MotoForm>,
     defaultValues: {
       modelo: '',
       placa: '',
+      status: undefined,
     },
   });
 
-  const onSubmit = async (data: MotoForm) => {
-    try {
-      // Simular uma chamada de API
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+  const [loadingMoto, setLoadingMoto] = useState<boolean>(!!editingId);
+  const [saving, setSaving] = useState<boolean>(false);
 
-      Alert.alert(
-        'Moto Cadastrada!',
-        `Modelo: ${data.modelo}\nPlaca: ${data.placa}`,
-        [
-          {
-            text: 'OK',
-            onPress: () => reset(), // Limpa o formulário após sucesso
+  useEffect(() => {
+    if (!editingId) return;
+
+    let isMounted = true;
+    const loadMoto = async () => {
+      try {
+        setLoadingMoto(true);
+        const moto = await motosService.get(editingId, token ?? undefined);
+        if (!isMounted) return;
+        reset({
+          modelo: moto.modelo ?? '',
+          placa: moto.placa ?? '',
+          status: moto.status ?? undefined,
+        });
+      } catch (e: any) {
+        Alert.alert('Erro', e?.message ?? 'Falha ao carregar moto');
+      } finally {
+        if (isMounted) setLoadingMoto(false);
+      }
+    };
+
+    loadMoto();
+    return () => {
+      isMounted = false;
+    };
+  }, [editingId, reset, token]);
+
+  const onSubmit: SubmitHandler<MotoForm> = async (values) => {
+    const payload = {
+      modelo: values.modelo,
+      placa: values.placa,
+      status: values.status,
+    };
+
+    try {
+      setSaving(true);
+      if (editingId) {
+        await motosService.update(editingId, payload, token ?? undefined);
+      } else {
+        await motosService.create(payload, token ?? undefined);
+      }
+
+      Alert.alert('Sucesso', 'Dados salvos!', [
+        {
+          text: 'OK',
+          onPress: () => {
+            if (editingId) {
+              navigation.goBack();
+            } else {
+              reset({ modelo: '', placa: '', status: undefined });
+            }
           },
-        ],
-      );
-    } catch (error) {
-      Alert.alert(
-        'Erro',
-        'Não foi possível cadastrar a moto. Tente novamente.',
-      );
+        },
+      ]);
+    } catch (e: any) {
+      Alert.alert('Erro', e?.message ?? 'Falha ao salvar');
+    } finally {
+      setSaving(false);
     }
   };
+
+  if (loadingMoto) {
+    return (
+      <ThemedView style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <ActivityIndicator />
+        <ThemedText style={{ marginTop: 8 }}>Carregando dados da moto…</ThemedText>
+      </ThemedView>
+    );
+  }
 
   return (
     <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
       <ThemedView style={styles.container}>
-        {/* Header */}
         <View style={styles.header}>
           <View style={[styles.iconContainer, { backgroundColor: `${accentColor}20` }]}>
-            <Ionicons name="add-circle" size={32} color={accentColor} />
+            <Ionicons name={editingId ? 'create' : 'add-circle'} size={32} color={accentColor} />
           </View>
           <ThemedText type="title" style={styles.title}>
-            Cadastrar Nova Moto
+            {editingId ? 'Editar Moto' : 'Cadastrar Nova Moto'}
           </ThemedText>
           <ThemedText style={styles.subtitle}>
-            Preencha os dados abaixo para adicionar uma nova motocicleta à frota
+            Preencha os dados abaixo para {editingId ? 'atualizar' : 'adicionar'} a motocicleta na frota
           </ThemedText>
         </View>
 
-        {/* Form Card */}
         <ThemedView style={[styles.formCard, { backgroundColor: cardColor, borderColor: borderColor }]}>
           <View style={styles.formHeader}>
             <Ionicons name="document-text" size={20} color={accentColor} />
@@ -128,17 +194,33 @@ export default function FormularioScreen() {
               />
             </View>
 
+            <View style={styles.inputSection}>
+              <View style={styles.inputHeader}>
+                <Ionicons name="bar-chart" size={16} color="#666" />
+                <ThemedText style={styles.inputLabel}>Status (opcional)</ThemedText>
+              </View>
+              <ControlledInput
+                name="status"
+                control={control}
+                label=""
+                placeholder="Disponível, Em manutenção..."
+                error={errors.status}
+                autoCapitalize="sentences"
+                style={styles.input}
+              />
+            </View>
+
             <TouchableOpacity
               style={[
                 styles.submitButton,
                 { backgroundColor: accentColor },
-                isSubmitting && styles.buttonDisabled,
+                saving && styles.buttonDisabled,
               ]}
               onPress={handleSubmit(onSubmit)}
-              disabled={isSubmitting}
+              disabled={saving}
               activeOpacity={0.8}
             >
-              {isSubmitting ? (
+              {saving ? (
                 <View style={styles.loadingContainer}>
                   <ActivityIndicator color="white" size="small" />
                   <ThemedText style={styles.buttonText}>Salvando...</ThemedText>
@@ -146,7 +228,9 @@ export default function FormularioScreen() {
               ) : (
                 <View style={styles.buttonContent}>
                   <Ionicons name="checkmark" size={20} color="white" />
-                  <ThemedText style={styles.buttonText}>Cadastrar Moto</ThemedText>
+                  <ThemedText style={styles.buttonText}>
+                    {editingId ? 'Atualizar Moto' : 'Cadastrar Moto'}
+                  </ThemedText>
                 </View>
               )}
             </TouchableOpacity>
@@ -154,7 +238,7 @@ export default function FormularioScreen() {
             <TouchableOpacity
               style={styles.clearButton}
               onPress={() => {
-                reset();
+                reset({ modelo: '', placa: '', status: undefined });
                 Alert.alert('Formulário Limpo', 'Os campos foram limpos. Você pode preencher novamente.');
               }}
               activeOpacity={0.8}
@@ -165,7 +249,6 @@ export default function FormularioScreen() {
           </View>
         </ThemedView>
 
-        {/* Helper Text */}
         <View style={styles.helperSection}>
           <Ionicons name="information-circle" size={16} color="#999" />
           <ThemedText style={styles.helperText}>
@@ -217,10 +300,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     borderWidth: 1,
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 5,
@@ -267,10 +347,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     marginTop: 8,
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
     elevation: 5,
