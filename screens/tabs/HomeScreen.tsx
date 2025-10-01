@@ -10,10 +10,12 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 
 import { useAuth } from '../../src/contexts/auth';
+import { useTranslation } from '../../src/hooks/useTranslation';
 import { ThemedView } from '../../src/components/ThemedView';
 
 export default function HomeScreen() {
   const { usuario, logout } = useAuth();
+  const { t } = useTranslation();
 
   const handleLogout = async () => {
     try {

@@ -13,11 +13,15 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { useAuth } from '../../src/contexts/auth';
 import { useThemeCustom } from '../../src/contexts/theme';
+import { useTranslation } from '../../src/hooks/useTranslation';
+import { useNotifications } from '../../src/contexts/notifications';
 import { ThemedView } from '../../src/components/ThemedView';
 
 export default function ConfiguracoesScreen() {
   const { usuario, logout } = useAuth();
   const { mode, setMode } = useThemeCustom();
+  const { t, currentLanguage, changeLanguage, availableLanguages } = useTranslation();
+  const { initializeNotifications, token, isRegistered } = useNotifications();
 
   const handleLogout = async () => {
     Alert.alert(
@@ -40,6 +44,20 @@ export default function ConfiguracoesScreen() {
     );
   };
 
+  const handleChangeLanguage = () => {
+    Alert.alert(
+      t('settings.language.title'),
+      t('settings.language.selectLanguage'),
+      [
+        ...availableLanguages.map((lang) => ({
+          text: `${lang.flag} ${lang.name}`,
+          onPress: () => changeLanguage(lang.code),
+        })),
+        { text: t('common.cancel'), style: 'cancel' as const }
+      ]
+    );
+  };
+
   const toggleTheme = () => {
     setMode(mode === 'dark' ? 'light' : 'dark');
   };
@@ -52,8 +70,24 @@ export default function ConfiguracoesScreen() {
     Alert.alert('Alterar Senha', 'Funcionalidade em desenvolvimento');
   };
 
-  const handleNotifications = () => {
-    Alert.alert('Notificações', 'Funcionalidade em desenvolvimento');
+  const handleNotifications = async () => {
+    try {
+      await initializeNotifications();
+      Alert.alert(
+        'Notificações', 
+        `Status: ${isRegistered ? 'Ativadas' : 'Desativadas'}\n` +
+        `Token: ${token ? 'Configurado' : 'Não configurado'}`,
+        [
+          { text: 'OK' },
+          { 
+            text: 'Reinicializar', 
+            onPress: () => initializeNotifications() 
+          }
+        ]
+      );
+    } catch (error) {
+      Alert.alert('Erro', 'Erro ao configurar notificações');
+    }
   };
 
   const handleSupport = () => {
@@ -113,6 +147,16 @@ export default function ConfiguracoesScreen() {
                 thumbColor="#fff"
               />
             </View>
+
+            <TouchableOpacity style={styles.settingItem} onPress={handleChangeLanguage}>
+              <Ionicons name="language" size={20} color="#666" />
+              <Text style={styles.settingText}>{t('settings.language.title')}</Text>
+              <Text style={[styles.settingText, { color: '#999', fontSize: 14, marginLeft: 'auto', marginRight: 8 }]}>
+                {availableLanguages.find(lang => lang.code === currentLanguage)?.flag} 
+                {availableLanguages.find(lang => lang.code === currentLanguage)?.name}
+              </Text>
+              <Ionicons name="chevron-forward" size={16} color="#ccc" />
+            </TouchableOpacity>
 
             <TouchableOpacity style={styles.settingItem} onPress={handleNotifications}>
               <Ionicons name="notifications" size={20} color="#666" />

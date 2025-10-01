@@ -7,46 +7,130 @@ import {
   SafeAreaView,
   TouchableOpacity,
   Alert,
+  ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import { ThemedView } from '../../src/components/ThemedView';
+import { motosService, MotoDTO } from '../../src/services/motosService';
+import { useAuth } from '../../src/contexts/auth';
 
 export default function MotosScreen() {
-  const [motos] = useState([
-    { id: '1', modelo: 'Honda CB 600F', placa: 'ABC-1234', status: 'disponivel' },
-    { id: '2', modelo: 'Yamaha MT-03', placa: 'XYZ-5678', status: 'manutencao' },
-    { id: '3', modelo: 'Kawasaki Ninja 400', placa: 'DEF-9012', status: 'disponivel' },
-  ]);
+  const [motos, setMotos] = useState<MotoDTO[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const { token } = useAuth();
+
+  useEffect(() => {
+    carregarMotos();
+  }, []);
+
+  const carregarMotos = async () => {
+    try {
+      setLoading(true);
+      const motosData = await motosService.list(token || undefined);
+      setMotos(motosData);
+    } catch (error) {
+      console.error('Erro ao carregar motos:', error);
+      Alert.alert('Erro', 'Não foi possível carregar as motos');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await carregarMotos();
+    setRefreshing(false);
+  };
 
   const handleAddMoto = () => {
     Alert.alert('Nova Moto', 'Funcionalidade de adicionar moto em desenvolvimento');
   };
 
-  const renderMotoCard = (moto: any) => (
+  const handleEditMoto = (moto: MotoDTO) => {
+    Alert.alert('Editar Moto', `Funcionalidade de editar ${moto.modelo} em desenvolvimento`);
+  };
+
+  const handleDeleteMoto = async (moto: MotoDTO) => {
+    Alert.alert(
+      'Excluir Moto',
+      `Tem certeza que deseja excluir ${moto.modelo}?`,
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Excluir',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await motosService.remove(moto.id!, token || undefined);
+              await carregarMotos();
+              Alert.alert('Sucesso', 'Moto excluída com sucesso');
+            } catch (error) {
+              console.error('Erro ao excluir moto:', error);
+              Alert.alert('Erro', 'Não foi possível excluir a moto');
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status?.toLowerCase()) {
+      case 'disponível':
+        return '#28a745';
+      case 'em manutenção':
+        return '#ffc107';
+      case 'indisponível':
+        return '#dc3545';
+      default:
+        return '#6c757d';
+    }
+  };
+
+  const renderMotoCard = (moto: MotoDTO) => (
     <View key={moto.id} style={styles.motoCard}>
       <View style={styles.motoInfo}>
         <Text style={styles.motoModelo}>{moto.modelo}</Text>
         <Text style={styles.motoPlaca}>Placa: {moto.placa}</Text>
         <View style={[
           styles.statusBadge,
-          moto.status === 'disponivel' ? styles.statusDisponivel : styles.statusManutencao
+          { backgroundColor: getStatusColor(moto.status || 'Disponível') }
         ]}>
-          <Text style={styles.statusText}>
-            {moto.status === 'disponivel' ? 'Disponível' : 'Manutenção'}
-          </Text>
+          <Text style={styles.statusText}>{moto.status || 'Disponível'}</Text>
         </View>
       </View>
       <View style={styles.motoActions}>
-        <TouchableOpacity style={styles.actionButton}>
+        <TouchableOpacity 
+          style={styles.actionButton}
+          onPress={() => handleEditMoto(moto)}
+        >
           <Ionicons name="create" size={20} color="#007AFF" />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.actionButton}>
+        <TouchableOpacity 
+          style={styles.actionButton}
+          onPress={() => handleDeleteMoto(moto)}
+        >
           <Ionicons name="trash" size={20} color="#dc3545" />
         </TouchableOpacity>
       </View>
     </View>
   );
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <ThemedView style={styles.container}>
+          <View style={styles.emptyContainer}>
+            <ActivityIndicator size="large" color="#007AFF" />
+            <Text style={styles.emptyText}>Carregando motos...</Text>
+          </View>
+        </ThemedView>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -58,7 +142,12 @@ export default function MotosScreen() {
           </TouchableOpacity>
         </View>
 
-        <ScrollView contentContainerStyle={styles.scrollContent}>
+        <ScrollView 
+          contentContainerStyle={styles.scrollContent}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
           {motos.length === 0 ? (
             <View style={styles.emptyContainer}>
               <Ionicons name="bicycle-outline" size={64} color="#ccc" />

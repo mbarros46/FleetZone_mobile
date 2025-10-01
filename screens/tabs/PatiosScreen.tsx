@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,57 +7,113 @@ import {
   SafeAreaView,
   TouchableOpacity,
   Alert,
+  ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import { ThemedView } from '../../src/components/ThemedView';
+import { patiosService, Patio } from '../../src/services/patiosService';
+import { useAuth } from '../../src/contexts/auth';
 
 export default function PatiosScreen() {
-  const [patios] = useState([
-    { id: '1', nome: 'Pátio Central', endereco: 'Rua A, 123', capacidade: 50, ocupacao: 35 },
-    { id: '2', nome: 'Pátio Norte', endereco: 'Av. B, 456', capacidade: 30, ocupacao: 20 },
-    { id: '3', nome: 'Pátio Sul', endereco: 'Rua C, 789', capacidade: 40, ocupacao: 25 },
-  ]);
+  const [patios, setPatios] = useState<Patio[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const { token } = useAuth();
+
+  useEffect(() => {
+    carregarPatios();
+  }, []);
+
+  const carregarPatios = async () => {
+    try {
+      setLoading(true);
+      const patiosData = await patiosService.list(token || undefined);
+      setPatios(patiosData);
+    } catch (error) {
+      console.error('Erro ao carregar pátios:', error);
+      Alert.alert('Erro', 'Não foi possível carregar os pátios');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await carregarPatios();
+    setRefreshing(false);
+  };
 
   const handleAddPatio = () => {
     Alert.alert('Novo Pátio', 'Funcionalidade de adicionar pátio em desenvolvimento');
   };
 
-  const renderPatioCard = (patio: any) => {
-    const ocupacaoPercentual = Math.round((patio.ocupacao / patio.capacidade) * 100);
-    
+  const handleEditPatio = (patio: Patio) => {
+    Alert.alert('Editar Pátio', `Funcionalidade de editar ${patio.nome} em desenvolvimento`);
+  };
+
+  const handleDeletePatio = async (patio: Patio) => {
+    Alert.alert(
+      'Excluir Pátio',
+      `Tem certeza que deseja excluir ${patio.nome}?`,
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Excluir',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await patiosService.remove(patio.id, token || undefined);
+              await carregarPatios();
+              Alert.alert('Sucesso', 'Pátio excluído com sucesso');
+            } catch (error) {
+              console.error('Erro ao excluir pátio:', error);
+              Alert.alert('Erro', 'Não foi possível excluir o pátio');
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const renderPatioCard = (patio: Patio) => {
     return (
       <View key={patio.id} style={styles.patioCard}>
         <View style={styles.patioInfo}>
           <Text style={styles.patioNome}>{patio.nome}</Text>
-          <Text style={styles.patioEndereco}>{patio.endereco}</Text>
-          <View style={styles.ocupacaoContainer}>
-            <Text style={styles.ocupacaoText}>
-              Ocupação: {patio.ocupacao}/{patio.capacidade} ({ocupacaoPercentual}%)
-            </Text>
-            <View style={styles.progressBar}>
-              <View 
-                style={[
-                  styles.progressFill, 
-                  { width: `${ocupacaoPercentual}%` },
-                  ocupacaoPercentual > 80 ? styles.progressHigh : 
-                  ocupacaoPercentual > 50 ? styles.progressMedium : styles.progressLow
-                ]} 
-              />
-            </View>
-          </View>
+          <Text style={styles.patioEndereco}>{patio.localizacao || 'Localização não informada'}</Text>
         </View>
         <View style={styles.patioActions}>
-          <TouchableOpacity style={styles.actionButton}>
+          <TouchableOpacity 
+            style={styles.actionButton}
+            onPress={() => handleEditPatio(patio)}
+          >
             <Ionicons name="create" size={20} color="#007AFF" />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.actionButton}>
-            <Ionicons name="location" size={20} color="#28a745" />
+          <TouchableOpacity 
+            style={styles.actionButton}
+            onPress={() => handleDeletePatio(patio)}
+          >
+            <Ionicons name="trash" size={20} color="#dc3545" />
           </TouchableOpacity>
         </View>
       </View>
     );
   };
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <ThemedView style={styles.container}>
+          <View style={styles.emptyContainer}>
+            <ActivityIndicator size="large" color="#007AFF" />
+            <Text style={styles.emptyText}>Carregando pátios...</Text>
+          </View>
+        </ThemedView>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -69,7 +125,12 @@ export default function PatiosScreen() {
           </TouchableOpacity>
         </View>
 
-        <ScrollView contentContainerStyle={styles.scrollContent}>
+        <ScrollView 
+          contentContainerStyle={styles.scrollContent}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
           {patios.length === 0 ? (
             <View style={styles.emptyContainer}>
               <Ionicons name="location-outline" size={64} color="#ccc" />
