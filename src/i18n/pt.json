@@ -123,6 +123,42 @@
     "footer": "Desenvolvido com ❤️ para gerenciar frotas de motocicletas",
     "copyright": "© 2024 FleetZone. Todos os direitos reservados."
   },
+  "patios": {
+    "title": "Pátios",
+    "subtitle": "Gerencie os pátios da sua frota",
+    "fields": {
+      "nome": "Nome",
+      "localizacao": "Localização"
+    },
+    "placeholders": {
+      "nome": "Digite o nome do pátio",
+      "localizacao": "Digite a localização do pátio"
+    },
+    "form": {
+      "createTitle": "Novo Pátio",
+      "editTitle": "Editar Pátio"
+    },
+    "actions": {
+      "create": "Criar Pátio"
+    },
+    "messages": {
+      "empty": "Nenhum pátio encontrado.\nCrie o primeiro pátio para começar!",
+      "loadError": "Erro ao carregar pátios",
+      "createSuccess": "Pátio criado com sucesso!",
+      "createError": "Erro ao criar pátio",
+      "updateSuccess": "Pátio atualizado com sucesso!",
+      "updateError": "Erro ao atualizar pátio",
+      "deleteSuccess": "Pátio excluído com sucesso!",
+      "deleteError": "Erro ao excluir pátio"
+    },
+    "validation": {
+      "nomeRequired": "Nome é obrigatório"
+    },
+    "confirmDelete": {
+      "title": "Confirmar Exclusão",
+      "message": "Tem certeza de que deseja excluir o pátio '{{name}}'? Esta ação não pode ser desfeita."
+    }
+  },
   "notifications": {
     "title": "Notificações",
     "subtitle": "Configure suas preferências de notificação",

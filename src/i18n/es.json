@@ -123,6 +123,42 @@
     "footer": "Desarrollado con ❤️ para gestionar flotas de motocicletas",
     "copyright": "© 2024 FleetZone. Todos los derechos reservados."
   },
+  "patios": {
+    "title": "Patios",
+    "subtitle": "Gestiona los patios de tu flota",
+    "fields": {
+      "nome": "Nombre",
+      "localizacao": "Ubicación"
+    },
+    "placeholders": {
+      "nome": "Ingresa el nombre del patio",
+      "localizacao": "Ingresa la ubicación del patio"
+    },
+    "form": {
+      "createTitle": "Nuevo Patio",
+      "editTitle": "Editar Patio"
+    },
+    "actions": {
+      "create": "Crear Patio"
+    },
+    "messages": {
+      "empty": "No se encontraron patios.\n¡Crea el primer patio para comenzar!",
+      "loadError": "Error al cargar patios",
+      "createSuccess": "¡Patio creado con éxito!",
+      "createError": "Error al crear patio",
+      "updateSuccess": "¡Patio actualizado con éxito!",
+      "updateError": "Error al actualizar patio",
+      "deleteSuccess": "¡Patio eliminado con éxito!",
+      "deleteError": "Error al eliminar patio"
+    },
+    "validation": {
+      "nomeRequired": "El nombre es obligatorio"
+    },
+    "confirmDelete": {
+      "title": "Confirmar Eliminación",
+      "message": "¿Estás seguro de que deseas eliminar el patio '{{name}}'? Esta acción no se puede deshacer."
+    }
+  },
   "notifications": {
     "title": "Notificaciones",
     "subtitle": "Configura tus preferencias de notificación",
