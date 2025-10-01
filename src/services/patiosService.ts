@@ -1,25 +1,33 @@
 import { apiConfig, authenticatedFetch } from './api';
 
-export interface MotoDTO {
-  id?: number;
-  modelo: string;
-  placa: string;
-  status?: string; // no Java é opcional
-  patioId?: number; // usamos pra criar/mover
+export interface Patio {
+  id: number;
+  nome: string;
+  localizacao?: string;
 }
 
-const base = `${apiConfig.baseURL}/api/motos`;
+export interface PatioRelatorio {
+  id: number;
+  nome: string;
+  totalMotos: number;
+  motosDisponiveis?: number;
+  motosManutencao?: number;
+  motosAlugadas?: number;
+  localizacao?: string;
+}
 
-export const motosService = {
-  async list(token?: string): Promise<MotoDTO[]> {
+const base = `${apiConfig.baseURL}/api/patios`;
+
+export const patiosService = {
+  async list(token?: string): Promise<Patio[]> {
     const r = await authenticatedFetch(base, { method: 'GET' }, token);
     return r.json();
   },
-  async get(id: number, token?: string): Promise<MotoDTO> {
+  async get(id: number, token?: string): Promise<Patio> {
     const r = await authenticatedFetch(`${base}/${id}`, { method: 'GET' }, token);
     return r.json();
   },
-  async create(data: MotoDTO, token?: string): Promise<MotoDTO> {
+  async create(data: Partial<Patio>, token?: string): Promise<Patio> {
     const r = await authenticatedFetch(base, {
       method: 'POST',
       body: JSON.stringify(data),
@@ -27,7 +35,7 @@ export const motosService = {
     }, token);
     return r.json();
   },
-  async update(id: number, data: MotoDTO, token?: string): Promise<MotoDTO> {
+  async update(id: number, data: Partial<Patio>, token?: string): Promise<Patio> {
     const r = await authenticatedFetch(`${base}/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
@@ -35,13 +43,12 @@ export const motosService = {
     }, token);
     return r.json();
   },
-  async move(id: number, patioId: number, token?: string): Promise<MotoDTO> {
-    const r = await authenticatedFetch(`${base}/${id}/mover?patioId=${patioId}`, {
-      method: 'PUT',
-    }, token);
-    return r.json();
-  },
   async remove(id: number, token?: string): Promise<void> {
     await authenticatedFetch(`${base}/${id}`, { method: 'DELETE' }, token);
   },
+  async relatorio(token?: string): Promise<PatioRelatorio[]> {
+    const r = await authenticatedFetch(`${base}/relatorio`, { method: 'GET' }, token);
+    return r.json();
+  },
 };
+
