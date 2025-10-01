@@ -1,6 +1,6 @@
 {
   "name": "fleetzone",
-  "main": "expo-router/entry",
+  "main": "App.js",
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
@@ -40,11 +40,11 @@
     "expo-linking": "~8.0.8",
     "expo-localization": "^17.0.7",
     "expo-notifications": "^0.32.12",
-    "expo-router": "~6.0.8",
     "expo-splash-screen": "~31.0.10",
     "expo-status-bar": "~3.0.8",
     "expo-symbols": "~1.0.7",
     "expo-web-browser": "~15.0.7",
+    "firebase": "^12.3.0",
     "i18n-js": "^4.5.1",
     "react": "19.1.0",
     "react-dom": "19.1.0",
@@ -54,9 +54,11 @@
     "react-native-reanimated": "~4.1.0",
     "react-native-safe-area-context": "~5.6.0",
     "react-native-screens": "~4.16.0",
+    "react-native-super-grid": "^6.0.2",
     "react-native-vector-icons": "^10.2.0",
     "react-native-web": "^0.21.0",
     "react-native-worklets": "^0.5.1",
+    "yup": "^1.7.1",
     "zod": "^4.1.11"
   },
   "devDependencies": {
