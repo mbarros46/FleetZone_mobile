@@ -79,7 +79,10 @@
     "appearance": "Aparência",
     "colors": "Cores",
     "account": "Conta",
-    "language": "Idioma",
+    "language": {
+      "title": "Idioma",
+      "selectLanguage": "Selecione o idioma"
+    },
     "notifications": "Notificações",
     "theme": {
       "title": "Tema do App",
