@@ -2,7 +2,7 @@ import 'react-native-reanimated';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 import { View, Text } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -112,45 +112,67 @@ function AppNavigator() {
 }
 
 export default function App() {
+  const [ready, setReady] = useState(false);
   const [loaded] = useFonts({
     SpaceMono: require('./assets/fonts/SpaceMono-Regular.ttf'),
   });
 
   useEffect(() => {
-    if (loaded) {
-      console.log('Fonts loaded, hiding splash screen');
-      SplashScreen.hideAsync();
+    async function prepare() {
+      try {
+        console.log('🚀 Iniciando carregamento do app...');
+        
+        // Aguarda as fontes carregarem
+        if (loaded) {
+          console.log('✅ Fontes carregadas com sucesso');
+          // Pequeno delay para garantir que tudo está pronto
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+      } catch (e) {
+        console.warn('⚠️ Erro durante carregamento:', e);
+      } finally {
+        if (loaded) {
+          console.log('🎯 App pronto para ser exibido');
+          setReady(true);
+        }
+      }
     }
+
+    prepare();
   }, [loaded]);
 
-  console.log('App render - loaded:', loaded);
+  const onLayoutRootView = useCallback(async () => {
+    if (ready) {
+      console.log('🔄 Ocultando splash screen...');
+      await SplashScreen.hideAsync();
+      console.log('✨ Splash screen ocultado com sucesso');
+    }
+  }, [ready]);
 
-  if (!loaded) {
-    console.log('Showing loading screen');
-    return (
-      <View style={{ flex: 1, backgroundColor: '#FFF', justifyContent: 'center', alignItems: 'center' }}>
-        <Text style={{ fontSize: 18, color: '#333' }}>Carregando fontes...</Text>
-      </View>
-    );
+  // Mostra loading enquanto não está pronto
+  if (!ready) {
+    return null; // SplashScreen nativo será exibido
   }
 
-  console.log('App fully loaded, rendering main app');
+  console.log('🎯 Renderizando app completo');
 
   try {
     return (
-      <ThemeProviderCustom>
-        <AuthProvider>
-          <NotificationsProvider>
-            <NavigationContainer>
-              <AppNavigator />
-            </NavigationContainer>
-            <StatusBar style="auto" />
-          </NotificationsProvider>
-        </AuthProvider>
-      </ThemeProviderCustom>
+      <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
+        <ThemeProviderCustom>
+          <AuthProvider>
+            <NotificationsProvider>
+              <NavigationContainer>
+                <AppNavigator />
+              </NavigationContainer>
+              <StatusBar style="auto" />
+            </NotificationsProvider>
+          </AuthProvider>
+        </ThemeProviderCustom>
+      </View>
     );
   } catch (error) {
-    console.error('Error rendering app:', error);
+    console.error('❌ Erro crítico ao renderizar app:', error);
     return (
       <View style={{ flex: 1, backgroundColor: '#FFF', justifyContent: 'center', alignItems: 'center' }}>
         <Text style={{ fontSize: 18, color: 'red' }}>Erro ao carregar o app</Text>
