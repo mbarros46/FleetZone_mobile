@@ -34,6 +34,10 @@ const NotificationsIcon = ({ color }: { color: string }) => (
   <IconSymbol size={28} name="bell" color={color} />
 );
 
+const PatiosIcon = ({ color }: { color: string }) => (
+  <IconSymbol size={28} name="building.2" color={color} />
+);
+
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
@@ -65,6 +69,13 @@ export default function TabLayout() {
         options={{
           title: 'Motos',
           tabBarIcon: MotosIcon,
+        }}
+      />
+      <Tabs.Screen
+        name="patios"
+        options={{
+          title: 'Pátios',
+          tabBarIcon: PatiosIcon,
         }}
       />
       <Tabs.Screen

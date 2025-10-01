@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   TouchableOpacity,
@@ -7,6 +7,7 @@ import {
   ScrollView,
   View,
   TextInput,
+  FlatList,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -14,6 +15,7 @@ import { ThemedText, ThemedView } from '../../src/components';
 import { useAccentColor } from '../../src/styles/theme';
 import { useThemeColor } from '../../hooks/useThemeColor';
 import { useTranslation } from '../../src/hooks/useTranslation';
+import { useNotifications } from '../../src/contexts/notifications';
 import { notificationsService } from '../../src/services/notificationsService';
 
 export default function NotificacoesScreen() {
@@ -21,392 +23,397 @@ export default function NotificacoesScreen() {
   const cardColor = useThemeColor({}, 'card');
   const borderColor = useThemeColor({}, 'border');
   const { t } = useTranslation();
+  const {
+    notifications,
+    hasUnreadNotifications,
+    isRegistered,
+    token,
+    loading,
+    markAsRead,
+    markAllAsRead,
+    clearAllNotifications,
+    getUnreadCount,
+  } = useNotifications();
 
-  const [token, setToken] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
   const [testTitle, setTestTitle] = useState('FleetZone Mobile');
   const [testBody, setTestBody] = useState('Esta é uma notificação de teste!');
 
-  useEffect(() => {
-    initializeNotifications();
-  }, []);
-
-  const initializeNotifications = async () => {
-    try {
-      setLoading(true);
-      const notificationToken = await notificationsService.registerForPushNotifications();
-      if (notificationToken) {
-        setToken(notificationToken.token);
-      }
-    } catch (error: any) {
-      Alert.alert(t('notifications.testError'), error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleTestNotification = async () => {
     try {
-      setLoading(true);
-      await notificationsService.sendTestNotification();
-      Alert.alert(t('notifications.testSuccess'), 'Notificação de teste enviada!');
-    } catch (error: any) {
-      Alert.alert(t('notifications.testError'), error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleCustomNotification = async () => {
-    if (!testTitle.trim() || !testBody.trim()) {
-      Alert.alert('Erro', 'Preencha título e mensagem');
-      return;
-    }
-
-    try {
-      setLoading(true);
       await notificationsService.sendNotification(testTitle, testBody);
-      Alert.alert(t('notifications.testSuccess'), 'Notificação personalizada enviada!');
+      Alert.alert(t('notifications.testSuccess'));
     } catch (error: any) {
       Alert.alert(t('notifications.testError'), error.message);
-    } finally {
-      setLoading(false);
     }
   };
 
-  const handleRequestPermissions = async () => {
-    try {
-      setLoading(true);
-      const granted = await notificationsService.requestPermissions();
-      if (granted) {
-        Alert.alert('Sucesso', t('notifications.permissionGranted'));
-        await initializeNotifications();
-      } else {
-        Alert.alert('Erro', t('notifications.permissionDenied'));
-      }
-    } catch (error: any) {
-      Alert.alert('Erro', error.message);
-    } finally {
-      setLoading(false);
-    }
+  const handleClearAll = () => {
+    Alert.alert(
+      'Limpar Notificações',
+      'Tem certeza de que deseja limpar todas as notificações?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { 
+          text: 'Limpar', 
+          style: 'destructive',
+          onPress: clearAllNotifications
+        },
+      ]
+    );
   };
 
-  const copyToken = () => {
-    if (token) {
-      // Em um app real, você usaria Clipboard.setString(token)
-      Alert.alert('Token Copiado', 'Token copiado para a área de transferência');
-    }
-  };
+  const renderNotification = ({ item }: { item: any }) => (
+    <TouchableOpacity
+      style={[
+        styles.notificationItem,
+        { backgroundColor: cardColor, borderColor },
+        !item.read && { backgroundColor: `${accentColor}10` }
+      ]}
+      onPress={() => markAsRead(item.id)}
+    >
+      <View style={styles.notificationHeader}>
+        <ThemedText style={[styles.notificationTitle, !item.read && styles.unreadTitle]}>
+          {item.title}
+        </ThemedText>
+        <ThemedText style={styles.notificationTime}>
+          {new Date(item.timestamp).toLocaleTimeString()}
+        </ThemedText>
+      </View>
+      <ThemedText style={styles.notificationBody}>{item.body}</ThemedText>
+      {!item.read && (
+        <View style={[styles.unreadIndicator, { backgroundColor: accentColor }]} />
+      )}
+    </TouchableOpacity>
+  );
+
+  if (loading) {
+    return (
+      <ThemedView style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={accentColor} />
+          <ThemedText>{t('common.loading')}</ThemedText>
+        </View>
+      </ThemedView>
+    );
+  }
 
   return (
-    <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-      <ThemedView style={styles.container}>
+    <ThemedView style={styles.container}>
+      <ScrollView style={styles.content}>
         {/* Header */}
         <View style={styles.header}>
-          <View style={[styles.iconContainer, { backgroundColor: `${accentColor}20` }]}>
-            <Ionicons name="notifications" size={32} color={accentColor} />
-          </View>
-          <ThemedText type="title" style={styles.title}>
-            {t('notifications.title')}
-          </ThemedText>
+          <ThemedText style={styles.title}>{t('notifications.title')}</ThemedText>
           <ThemedText style={styles.subtitle}>
             {t('notifications.subtitle')}
           </ThemedText>
         </View>
 
-        {/* Token Section */}
-        <ThemedView style={[styles.infoCard, { backgroundColor: cardColor, borderColor: borderColor }]}>
+        {/* Status */}
+        <View style={[styles.statusCard, { backgroundColor: cardColor, borderColor }]}>
+          <View style={styles.statusRow}>
+            <Ionicons
+              name={isRegistered ? 'checkmark-circle' : 'alert-circle'}
+              size={20}
+              color={isRegistered ? '#34C759' : '#FF9500'}
+            />
+            <ThemedText style={styles.statusText}>
+              {isRegistered ? 'Notificações Ativadas' : 'Notificações Desativadas'}
+            </ThemedText>
+          </View>
+          
+          {token && (
+            <View style={styles.tokenContainer}>
+              <ThemedText style={styles.tokenLabel}>{t('notifications.token')}:</ThemedText>
+              <ThemedText style={styles.tokenText} numberOfLines={1}>
+                {`${token.substring(0, 20)}...`}
+              </ThemedText>
+            </View>
+          )}
+        </View>
+
+        {/* Test Notifications */}
+        <View style={[styles.card, { backgroundColor: cardColor, borderColor }]}>
           <View style={styles.cardHeader}>
-            <Ionicons name="key" size={20} color={accentColor} />
-            <ThemedText style={styles.cardTitle}>{t('notifications.token')}</ThemedText>
+            <Ionicons name="flask" size={20} color={accentColor} />
+            <ThemedText style={styles.cardTitle}>Testar Notificações</ThemedText>
           </View>
 
-          <View style={styles.tokenSection}>
-            {token ? (
-              <View style={styles.tokenContainer}>
-                <ThemedText style={styles.tokenLabel}>Token de Notificação:</ThemedText>
-                <ThemedText style={styles.tokenText} numberOfLines={3}>
-                  {token}
-                </ThemedText>
+          <View style={styles.inputGroup}>
+            <ThemedText style={styles.inputLabel}>Título:</ThemedText>
+            <TextInput
+              style={[styles.input, { borderColor, color: useThemeColor({}, 'text') }]}
+              value={testTitle}
+              onChangeText={setTestTitle}
+              placeholder="Digite o título"
+              placeholderTextColor="#999"
+            />
+          </View>
+
+          <View style={styles.inputGroup}>
+            <ThemedText style={styles.inputLabel}>Mensagem:</ThemedText>
+            <TextInput
+              style={[styles.input, styles.textArea, { borderColor, color: useThemeColor({}, 'text') }]}
+              value={testBody}
+              onChangeText={setTestBody}
+              placeholder="Digite a mensagem"
+              placeholderTextColor="#999"
+              multiline
+              numberOfLines={3}
+            />
+          </View>
+
+          <TouchableOpacity
+            style={[styles.testButton, { backgroundColor: accentColor }]}
+            onPress={handleTestNotification}
+          >
+            <Ionicons name="send" size={16} color="#FFFFFF" />
+            <ThemedText style={styles.testButtonText}>
+              {t('notifications.testNotification')}
+            </ThemedText>
+          </TouchableOpacity>
+        </View>
+
+        {/* Notifications List */}
+        <View style={[styles.card, { backgroundColor: cardColor, borderColor }]}>
+          <View style={styles.listHeader}>
+            <View style={styles.cardHeader}>
+              <Ionicons name="list" size={20} color={accentColor} />
+              <ThemedText style={styles.cardTitle}>
+                Notificações Recebidas ({notifications.length})
+              </ThemedText>
+            </View>
+            
+            {notifications.length > 0 && (
+              <View style={styles.listActions}>
+                {hasUnreadNotifications && (
+                  <TouchableOpacity
+                    style={[styles.actionButton, { borderColor: accentColor }]}
+                    onPress={markAllAsRead}
+                  >
+                    <ThemedText style={[styles.actionButtonText, { color: accentColor }]}>
+                      Marcar Todas como Lidas
+                    </ThemedText>
+                  </TouchableOpacity>
+                )}
+                
                 <TouchableOpacity
-                  style={[styles.copyButton, { backgroundColor: accentColor }]}
-                  onPress={copyToken}
+                  style={[styles.actionButton, styles.deleteButton]}
+                  onPress={handleClearAll}
                 >
-                  <Ionicons name="copy" size={16} color="white" />
-                  <ThemedText style={styles.copyButtonText}>Copiar Token</ThemedText>
+                  <ThemedText style={[styles.actionButtonText, styles.deleteButtonText]}>
+                    Limpar Todas
+                  </ThemedText>
                 </TouchableOpacity>
-              </View>
-            ) : (
-              <View style={styles.noTokenContainer}>
-                <Ionicons name="warning" size={24} color="#FF9800" />
-                <ThemedText style={styles.noTokenText}>
-                  Token não disponível. Solicite permissões primeiro.
-                </ThemedText>
               </View>
             )}
           </View>
-        </ThemedView>
 
-        {/* Test Notifications Section */}
-        <ThemedView style={[styles.infoCard, { backgroundColor: cardColor, borderColor: borderColor }]}>
-          <View style={styles.cardHeader}>
-            <Ionicons name="flask" size={20} color={accentColor} />
-            <ThemedText style={styles.cardTitle}>Teste de Notificações</ThemedText>
-          </View>
-
-          <View style={styles.testSection}>
-            <TouchableOpacity
-              style={[styles.testButton, { backgroundColor: accentColor }]}
-              onPress={handleTestNotification}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator color="white" size="small" />
-              ) : (
-                <Ionicons name="send" size={20} color="white" />
-              )}
-              <ThemedText style={styles.testButtonText}>
-                {t('notifications.testNotification')}
+          {notifications.length === 0 ? (
+            <View style={styles.emptyState}>
+              <Ionicons name="notifications-off" size={40} color="#999" />
+              <ThemedText style={styles.emptyText}>
+                Nenhuma notificação recebida ainda
               </ThemedText>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.permissionButton, { borderColor: accentColor }]}
-              onPress={handleRequestPermissions}
-              disabled={loading}
-            >
-              <Ionicons name="shield-checkmark" size={20} color={accentColor} />
-              <ThemedText style={[styles.permissionButtonText, { color: accentColor }]}>
-                Solicitar Permissões
+              <ThemedText style={styles.emptySubtext}>
+                As notificações aparecerão aqui quando chegarem
               </ThemedText>
-            </TouchableOpacity>
-          </View>
-        </ThemedView>
-
-        {/* Custom Notification Section */}
-        <ThemedView style={[styles.infoCard, { backgroundColor: cardColor, borderColor: borderColor }]}>
-          <View style={styles.cardHeader}>
-            <Ionicons name="create" size={20} color={accentColor} />
-            <ThemedText style={styles.cardTitle}>Notificação Personalizada</ThemedText>
-          </View>
-
-          <View style={styles.customSection}>
-            <View style={styles.inputGroup}>
-              <ThemedText style={styles.inputLabel}>Título:</ThemedText>
-              <TextInput
-                style={[styles.input, { borderColor: borderColor }]}
-                value={testTitle}
-                onChangeText={setTestTitle}
-                placeholder="Digite o título da notificação"
-              />
             </View>
-
-            <View style={styles.inputGroup}>
-              <ThemedText style={styles.inputLabel}>Mensagem:</ThemedText>
-              <TextInput
-                style={[styles.input, styles.textArea, { borderColor: borderColor }]}
-                value={testBody}
-                onChangeText={setTestBody}
-                placeholder="Digite a mensagem da notificação"
-                multiline
-                numberOfLines={3}
-              />
-            </View>
-
-            <TouchableOpacity
-              style={[styles.customButton, { backgroundColor: accentColor }]}
-              onPress={handleCustomNotification}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator color="white" size="small" />
-              ) : (
-                <Ionicons name="paper-plane" size={20} color="white" />
-              )}
-              <ThemedText style={styles.customButtonText}>
-                Enviar Notificação Personalizada
-              </ThemedText>
-            </TouchableOpacity>
-          </View>
-        </ThemedView>
-      </ThemedView>
-    </ScrollView>
+          ) : (
+            <FlatList
+              data={notifications}
+              renderItem={renderNotification}
+              keyExtractor={(item) => item.id}
+              style={styles.notificationsList}
+              scrollEnabled={false}
+            />
+          )}
+        </View>
+      </ScrollView>
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
-  scrollView: {
-    flex: 1,
-    backgroundColor: '#fafafa',
-  },
   container: {
     flex: 1,
-    paddingHorizontal: 20,
   },
-  header: {
-    alignItems: 'center',
-    paddingTop: 40,
-    paddingBottom: 32,
-  },
-  iconContainer: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+  loadingContainer: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 16,
+    gap: 16,
+  },
+  content: {
+    flex: 1,
+    padding: 16,
+  },
+  header: {
+    marginBottom: 24,
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    textAlign: 'center',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    textAlign: 'center',
-    lineHeight: 22,
     opacity: 0.7,
   },
-  infoCard: {
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 20,
+  statusCard: {
+    padding: 16,
+    borderRadius: 12,
     borderWidth: 1,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    marginBottom: 16,
+  },
+  statusRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  statusText: {
+    fontSize: 16,
+    fontWeight: '500',
+    marginLeft: 8,
+  },
+  tokenContainer: {
+    marginTop: 8,
+  },
+  tokenLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+    marginBottom: 4,
+  },
+  tokenText: {
+    fontSize: 12,
+    opacity: 0.7,
+    fontFamily: 'monospace',
+  },
+  card: {
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    marginBottom: 16,
   },
   cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 16,
-    gap: 8,
   },
   cardTitle: {
     fontSize: 18,
     fontWeight: '600',
+    marginLeft: 8,
   },
-  tokenSection: {
-    gap: 12,
+  inputGroup: {
+    marginBottom: 16,
   },
-  tokenContainer: {
-    gap: 12,
-  },
-  tokenLabel: {
-    fontSize: 14,
+  inputLabel: {
+    fontSize: 16,
     fontWeight: '500',
-    color: '#666',
+    marginBottom: 8,
   },
-  tokenText: {
-    fontSize: 12,
-    fontFamily: 'monospace',
-    backgroundColor: '#f8f9fa',
-    padding: 12,
-    borderRadius: 8,
+  input: {
     borderWidth: 1,
-    borderColor: '#e1e5e9',
-  },
-  copyButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
     borderRadius: 8,
-    gap: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    fontSize: 16,
   },
-  copyButtonText: {
-    color: 'white',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  noTokenContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    padding: 16,
-    backgroundColor: '#fff3cd',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#ffeaa7',
-  },
-  noTokenText: {
-    flex: 1,
-    fontSize: 14,
-    color: '#856404',
-  },
-  testSection: {
-    gap: 12,
+  textArea: {
+    height: 80,
+    textAlignVertical: 'top',
   },
   testButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 12,
-    paddingHorizontal: 16,
+    paddingHorizontal: 24,
     borderRadius: 8,
     gap: 8,
   },
   testButtonText: {
-    color: 'white',
-    fontSize: 14,
+    color: '#FFFFFF',
+    fontSize: 16,
     fontWeight: '600',
   },
-  permissionButton: {
+  listHeader: {
+    marginBottom: 16,
+  },
+  listActions: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
+    gap: 12,
+    marginTop: 12,
+  },
+  actionButton: {
     paddingHorizontal: 16,
-    borderRadius: 8,
+    paddingVertical: 8,
+    borderRadius: 6,
     borderWidth: 1,
-    gap: 8,
   },
-  permissionButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  customSection: {
-    gap: 16,
-  },
-  inputGroup: {
-    gap: 8,
-  },
-  inputLabel: {
+  actionButtonText: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#333',
   },
-  input: {
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 14,
-    backgroundColor: '#f8f9fa',
+  deleteButton: {
+    borderColor: '#FF3B30',
   },
-  textArea: {
-    height: 80,
-    textAlignVertical: 'top',
+  deleteButtonText: {
+    color: '#FF3B30',
   },
-  customButton: {
-    flexDirection: 'row',
+  emptyState: {
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    gap: 8,
+    paddingVertical: 32,
   },
-  customButtonText: {
-    color: 'white',
+  emptyText: {
+    fontSize: 16,
+    fontWeight: '500',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  emptySubtext: {
     fontSize: 14,
+    opacity: 0.7,
+    textAlign: 'center',
+  },
+  notificationsList: {
+    maxHeight: 400,
+  },
+  notificationItem: {
+    padding: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    marginBottom: 8,
+    position: 'relative',
+  },
+  notificationHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  notificationTitle: {
+    fontSize: 16,
+    fontWeight: '500',
+    flex: 1,
+  },
+  unreadTitle: {
     fontWeight: '600',
+  },
+  notificationTime: {
+    fontSize: 12,
+    opacity: 0.7,
+  },
+  notificationBody: {
+    fontSize: 14,
+    opacity: 0.8,
+  },
+  unreadIndicator: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
   },
 });
