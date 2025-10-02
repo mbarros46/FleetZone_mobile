@@ -89,6 +89,32 @@ export default function HomeScreen() {
               Configurações
             </ThemedText>
           </TouchableOpacity>
+
+          {/* Seção de Autenticação para teste */}
+          <ThemedView style={styles.authSection}>
+            <ThemedText style={styles.sectionTitle}>Autenticação (Para teste)</ThemedText>
+            <TouchableOpacity 
+              style={[styles.authButton, { backgroundColor: accentColor }]}
+              onPress={() => {
+                Alert.alert('Info', 'Navegue manualmente para /auth/login para testar');
+              }}
+              activeOpacity={0.8}
+            >
+              <Ionicons name="log-in" size={20} color="white" style={styles.buttonIcon} />
+              <ThemedText style={styles.primaryButtonText}>Login</ThemedText>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={[styles.authButton, { backgroundColor: '#4CAF50' }]}
+              onPress={() => {
+                Alert.alert('Info', 'Navegue manualmente para /auth/register para testar');
+              }}
+              activeOpacity={0.8}
+            >
+              <Ionicons name="person-add" size={20} color="white" style={styles.buttonIcon} />
+              <ThemedText style={styles.primaryButtonText}>Cadastro</ThemedText>
+            </TouchableOpacity>
+          </ThemedView>
         </ThemedView>
       </ThemedView>
     </ScrollView>
@@ -197,5 +223,34 @@ const styles = StyleSheet.create({
   },
   buttonIcon: {
     marginRight: 8,
+  },
+  authSection: {
+    marginTop: 30,
+    padding: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.05)',
+    borderRadius: 16,
+    gap: 12,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginBottom: 8,
+    opacity: 0.7,
+  },
+  authButton: {
+    flexDirection: 'row',
+    padding: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 3,
   },
 });
