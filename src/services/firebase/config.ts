@@ -6,11 +6,9 @@ import { initializeApp, getApps, getApp } from 'firebase/app';
 import {
   getAuth,
   initializeAuth,
-  getReactNativePersistence,
 } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyBN6rlhnaA8hykM8tgl826a8_fNBwE0LjE',
@@ -25,16 +23,18 @@ const firebaseConfig = {
 // Evita re-inicialização em hot reload
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
-// Auth com persistência no AsyncStorage (RN)
-let auth = getAuth(app);
+// Auth com persistência automática no React Native
+let auth;
 if (Platform.OS !== 'web') {
   try {
-    auth = initializeAuth(app, {
-      persistence: getReactNativePersistence(AsyncStorage),
-    });
+    // No React Native, a persistência já é o comportamento padrão
+    auth = initializeAuth(app);
   } catch {
-    // já inicializado em hot reload
+    // já inicializado em hot reload, usar a instância existente
+    auth = getAuth(app);
   }
+} else {
+  auth = getAuth(app);
 }
 
 // Firestore e Storage
