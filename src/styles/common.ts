@@ -10,7 +10,9 @@ export const commonStyles = StyleSheet.create({
     textAlign: 'center',
   },
   form: {
-    gap: 20,
+    // use Stack component or explicit margins between form fields instead of CSS gap
+    // gap is not supported consistently in React Native styles
+    paddingVertical: 4,
   },
   button: {
     padding: 15,

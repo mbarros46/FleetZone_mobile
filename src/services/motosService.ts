@@ -12,8 +12,14 @@ const base = `${apiConfig.baseURL}/api/motos`;
 
 export const motosService = {
   async list(token?: string): Promise<MotoDTO[]> {
-    const r = await authenticatedFetch(base, { method: 'GET' }, token);
-    return r.json();
+    try {
+      const r = await authenticatedFetch(base, { method: 'GET' }, token);
+      return r.json();
+    } catch (err) {
+      // Falha de rede/timeout — retornar lista vazia para não travar o UI
+      console.warn('motosService.list failed:', err);
+      return [];
+    }
   },
   async get(id: number, token?: string): Promise<MotoDTO> {
     const r = await authenticatedFetch(`${base}/${id}`, { method: 'GET' }, token);

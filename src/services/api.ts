@@ -42,17 +42,31 @@ export const getAuthHeaders = (token?: string) => ({
 
 // Função helper para requisições autenticadas
 export const authenticatedFetch = async (url: string, options: RequestInit = {}, token?: string) => {
-  const response = await fetch(url, {
-    ...options,
-    headers: {
-      ...getAuthHeaders(token),
-      ...options.headers,
-    },
-  });
+  const controller = new AbortController();
+  const timeout = apiConfig.timeout ?? 10000;
+  const id = setTimeout(() => controller.abort(), timeout);
 
-  if (!response.ok) {
-    throw new Error(await response.text());
+  try {
+    const response = await fetch(url, {
+      ...options,
+      headers: {
+        ...getAuthHeaders(token),
+        ...options.headers,
+      },
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      throw new Error(await response.text());
+    }
+
+    return response;
+  } catch (err: any) {
+    if (err.name === 'AbortError') {
+      throw new Error('Request timed out');
+    }
+    throw err;
+  } finally {
+    clearTimeout(id);
   }
-
-  return response;
 };
