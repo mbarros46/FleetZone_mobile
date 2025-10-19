@@ -14,6 +14,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 
 import { ControlledInput, ThemedText, ThemedView } from '../../src/components';
+import AppButton from '../../src/components/AppButton';
+import Stack from '../../src/components/Stack';
 import { useAccentColor } from '../../src/styles/theme';
 import { useThemeColor } from '../../hooks/useThemeColor';
 import { motosService } from '../../src/services/motosService';
@@ -160,10 +162,10 @@ export default function FormularioScreen() {
             <ThemedText style={styles.formTitle}>Informações da Moto</ThemedText>
           </View>
 
-          <View style={styles.form}>
-            <View style={styles.inputSection}>
+          <Stack spacing={20} style={styles.form}>
+            <View>
               <View style={styles.inputHeader}>
-                <Ionicons name="car-sport" size={16} color="#666" />
+                <Ionicons name="car-sport" size={16} color="#666" style={{ marginRight: 8 }} />
                 <ThemedText style={styles.inputLabel}>Modelo</ThemedText>
               </View>
               <ControlledInput
@@ -177,9 +179,9 @@ export default function FormularioScreen() {
               />
             </View>
 
-            <View style={styles.inputSection}>
+            <View>
               <View style={styles.inputHeader}>
-                <Ionicons name="document" size={16} color="#666" />
+                <Ionicons name="document" size={16} color="#666" style={{ marginRight: 8 }} />
                 <ThemedText style={styles.inputLabel}>Placa</ThemedText>
               </View>
               <ControlledInput
@@ -194,9 +196,9 @@ export default function FormularioScreen() {
               />
             </View>
 
-            <View style={styles.inputSection}>
+            <View>
               <View style={styles.inputHeader}>
-                <Ionicons name="bar-chart" size={16} color="#666" />
+                <Ionicons name="bar-chart" size={16} color="#666" style={{ marginRight: 8 }} />
                 <ThemedText style={styles.inputLabel}>Status (opcional)</ThemedText>
               </View>
               <ControlledInput
@@ -209,44 +211,28 @@ export default function FormularioScreen() {
                 style={styles.input}
               />
             </View>
+          </Stack>
 
-            <TouchableOpacity
-              style={[
-                styles.submitButton,
-                { backgroundColor: accentColor },
-                saving && styles.buttonDisabled,
-              ]}
-              onPress={handleSubmit(onSubmit)}
+            <AppButton
+              title={editingId ? 'Atualizar Moto' : 'Cadastrar Moto'}
+              icon="checkmark"
+              loading={saving}
+              onPress={handleSubmit(onSubmit) as any}
+              style={[styles.submitButton, { backgroundColor: accentColor }]}
               disabled={saving}
-              activeOpacity={0.8}
-            >
-              {saving ? (
-                <View style={styles.loadingContainer}>
-                  <ActivityIndicator color="white" size="small" />
-                  <ThemedText style={styles.buttonText}>Salvando...</ThemedText>
-                </View>
-              ) : (
-                <View style={styles.buttonContent}>
-                  <Ionicons name="checkmark" size={20} color="white" />
-                  <ThemedText style={styles.buttonText}>
-                    {editingId ? 'Atualizar Moto' : 'Cadastrar Moto'}
-                  </ThemedText>
-                </View>
-              )}
-            </TouchableOpacity>
+            />
 
-            <TouchableOpacity
-              style={styles.clearButton}
+            <AppButton
+              title="Limpar Formulário"
+              icon="refresh"
+              variant="outline"
+              color="#666"
               onPress={() => {
                 reset({ modelo: '', placa: '', status: undefined });
                 Alert.alert('Formulário Limpo', 'Os campos foram limpos. Você pode preencher novamente.');
               }}
-              activeOpacity={0.8}
-            >
-              <Ionicons name="refresh" size={16} color="#666" />
-              <ThemedText style={styles.clearButtonText}>Limpar Formulário</ThemedText>
-            </TouchableOpacity>
-          </View>
+              style={styles.clearButton}
+            />
         </ThemedView>
 
         <View style={styles.helperSection}>
@@ -309,22 +295,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 24,
-    gap: 8,
+    // use marginRight on icon/text instead of gap
   },
   formTitle: {
     fontSize: 18,
     fontWeight: '600',
   },
   form: {
-    gap: 20,
+    // spacing handled by Stack wrapper in markup
   },
   inputSection: {
-    gap: 8,
+    // use margins between inputs instead of gap
   },
   inputHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    // use marginRight on icon instead of gap
     marginBottom: 4,
   },
   inputLabel: {
@@ -359,13 +345,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
+    // use margin on icon/text instead of gap
   },
   loadingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
+    // spacing using margin between spinner and text
   },
   buttonText: {
     color: 'white',
@@ -375,7 +361,7 @@ const styles = StyleSheet.create({
   helperSection: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    gap: 8,
+    // use margin between icon and text
     paddingHorizontal: 4,
     marginBottom: 32,
   },
@@ -394,7 +380,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f9fa',
     borderRadius: 12,
     marginTop: 12,
-    gap: 8,
+    // use margin on child elements instead of gap
     borderWidth: 1,
     borderColor: '#e1e5e9',
   },

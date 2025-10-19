@@ -1,12 +1,13 @@
 import { ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+// evitar import direto (problemas de tipagem em algumas versões)
+const { Stack } = require('expo-router');
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 
-import { ThemeProviderCustom, useThemeCustom } from '../src/contexts/theme';
+import { ThemeProviderCustom, useThemeCustom, AuthProvider } from '../src/contexts';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -41,7 +42,9 @@ export default function RootLayout() {
 
   return (
     <ThemeProviderCustom>
-      <AppNav />
+      <AuthProvider>
+        <AppNav />
+      </AuthProvider>
     </ThemeProviderCustom>
   );
 }

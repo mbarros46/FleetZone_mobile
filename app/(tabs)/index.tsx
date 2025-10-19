@@ -1,11 +1,11 @@
 import { StyleSheet, ScrollView, View, TouchableOpacity, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-
 import { ThemedText, ThemedView } from '../../src/components';
+import AppButton from '../../src/components/AppButton';
 import { useAccentColor } from '../../src/styles/theme';
 import { useThemeColor } from '../../hooks/useThemeColor';
+import { useNavigation } from '@react-navigation/native';
 
 export default function HomeScreen() {
   const { accentColor } = useAccentColor();
@@ -50,45 +50,41 @@ export default function HomeScreen() {
         </ThemedView>
 
         <ThemedView style={styles.buttonContainer}>
-          <TouchableOpacity 
-            style={[styles.primaryButton, { backgroundColor: accentColor }]}
+          <AppButton
+            title="Ver Motos"
+            icon="list"
             onPress={() => {
               // @ts-ignore
               navigation.navigate('motos');
             }}
-            activeOpacity={0.8}
-          >
-            <Ionicons name="list" size={20} color="white" style={styles.buttonIcon} />
-            <ThemedText style={styles.primaryButtonText}>Ver Motos</ThemedText>
-          </TouchableOpacity>
+            style={[styles.primaryButton, { backgroundColor: accentColor }]}
+          />
 
-          <TouchableOpacity 
-            style={[styles.secondaryButton, { backgroundColor: surfaceColor, borderColor: borderColor }]}
+          <AppButton
+            title="Cadastrar Moto"
+            icon="add-circle"
             onPress={() => {
               // @ts-ignore
               navigation.navigate('formulario');
             }}
-            activeOpacity={0.8}
-          >
-            <Ionicons name="add-circle" size={20} color={accentColor} style={styles.buttonIcon} />
-            <ThemedText style={[styles.secondaryButtonText, { color: accentColor }]}>
-              Cadastrar Moto
-            </ThemedText>
-          </TouchableOpacity>
-
-          <TouchableOpacity 
+            variant="outline"
+            color={accentColor}
             style={[styles.secondaryButton, { backgroundColor: surfaceColor, borderColor: borderColor }]}
+            textStyle={[styles.secondaryButtonText, { color: accentColor } as any]}
+          />
+
+          <AppButton
+            title="Configurações"
+            icon="settings"
             onPress={() => {
               // @ts-ignore
               navigation.navigate('configuracoes');
             }}
-            activeOpacity={0.8}
-          >
-            <Ionicons name="settings" size={20} color={accentColor} style={styles.buttonIcon} />
-            <ThemedText style={[styles.secondaryButtonText, { color: accentColor }]}>
-              Configurações
-            </ThemedText>
-          </TouchableOpacity>
+            variant="outline"
+            color={accentColor}
+            style={[styles.secondaryButton, { backgroundColor: surfaceColor, borderColor: borderColor }]}
+            textStyle={[styles.secondaryButtonText, { color: accentColor } as any]}
+          />
 
           {/* Seção de Autenticação para teste */}
           <ThemedView style={styles.authSection}>
@@ -96,7 +92,8 @@ export default function HomeScreen() {
             <TouchableOpacity 
               style={[styles.authButton, { backgroundColor: accentColor }]}
               onPress={() => {
-                Alert.alert('Info', 'Navegue manualmente para /auth/login para testar');
+                // @ts-ignore
+                navigation.navigate('auth/login');
               }}
               activeOpacity={0.8}
             >
@@ -107,7 +104,8 @@ export default function HomeScreen() {
             <TouchableOpacity 
               style={[styles.authButton, { backgroundColor: '#4CAF50' }]}
               onPress={() => {
-                Alert.alert('Info', 'Navegue manualmente para /auth/register para testar');
+                // @ts-ignore
+                navigation.navigate('auth/register');
               }}
               activeOpacity={0.8}
             >
@@ -157,7 +155,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 30,
-    gap: 10,
+    // substitui gap por marginRight em cada card
   },
   statCard: {
     flex: 1,
@@ -187,7 +185,7 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     width: '100%',
-    gap: 16,
+    // use Stack or margins between buttons instead of gap
   },
   primaryButton: {
     flexDirection: 'row',
@@ -229,7 +227,7 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: 'rgba(0, 0, 0, 0.05)',
     borderRadius: 16,
-    gap: 12,
+    // spacing between auth buttons handled by margins
   },
   sectionTitle: {
     fontSize: 18,

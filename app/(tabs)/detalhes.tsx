@@ -13,6 +13,8 @@ import { z } from 'zod';
 import { Ionicons } from '@expo/vector-icons';
 
 import { ControlledInput, ThemedText, ThemedView } from '../../src/components';
+import AppButton from '../../src/components/AppButton';
+import Stack from '../../src/components/Stack';
 import { useAccentColor } from '../../src/styles/theme';
 import { useThemeColor } from '../../hooks/useThemeColor';
 
@@ -103,7 +105,7 @@ export default function DetalhesScreen() {
         {/* Quick Search Buttons */}
         <View style={styles.quickSearchCard}>
           <ThemedText style={styles.quickSearchTitle}>🚀 Busca Rápida - Motos Disponíveis:</ThemedText>
-          <View style={styles.quickButtonsGrid}>
+            <Stack direction="row" spacing={12} style={styles.quickButtonsGrid}>
             {motosMock.map((moto) => (
               <TouchableOpacity
                 key={moto.placa}
@@ -119,7 +121,7 @@ export default function DetalhesScreen() {
                 <ThemedText style={styles.quickSearchButtonModel}>{moto.modelo}</ThemedText>
               </TouchableOpacity>
             ))}
-          </View>
+            </Stack>
         </View>
 
         {/* Search Card */}
@@ -138,22 +140,12 @@ export default function DetalhesScreen() {
             maxLength={8}
           />
 
-          <TouchableOpacity
-            style={[
-              styles.searchButton,
-              { backgroundColor: accentColor },
-              isSubmitting && styles.buttonDisabled,
-            ]}
-            onPress={handleSubmit(onSubmit)}
-            disabled={isSubmitting}
-            activeOpacity={0.8}
-          >
-            {isSubmitting ? (
-              <ActivityIndicator color="white" size="small" />
-            ) : (
-              <ThemedText style={styles.buttonText}>Buscar Motocicleta</ThemedText>
-            )}
-          </TouchableOpacity>
+          <AppButton
+            title="Buscar Motocicleta"
+            loading={isSubmitting}
+            onPress={handleSubmit(onSubmit) as any}
+            style={[styles.searchButton, { backgroundColor: accentColor }]}
+          />
         </View>
 
         {/* Reset Button */}
@@ -185,6 +177,7 @@ export default function DetalhesScreen() {
                         motoSelecionada.status === 'Em manutenção' ? 'construct' : 'close-circle'} 
                   size={16} 
                   color={getStatusColor(motoSelecionada.status)}
+                  style={{ marginRight: 6 }}
                 />
                 <ThemedText style={[styles.statusText, { color: getStatusColor(motoSelecionada.status) }]}>
                   {motoSelecionada.status}
@@ -284,7 +277,7 @@ const styles = StyleSheet.create({
   searchHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    // use marginRight on icon/text instead of gap
     marginBottom: 16,
   },
   searchTitle: {
@@ -335,14 +328,14 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 20,
     backgroundColor: '#f8f9fa',
-    gap: 6,
+    // use margin on status icon instead of gap
   },
   statusText: {
     fontSize: 12,
     fontWeight: '600',
   },
   infoGrid: {
-    gap: 16,
+    // spacing between rows handled by margin/padding
   },
   infoRow: {
     flexDirection: 'row',
@@ -371,7 +364,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f9fa',
     borderRadius: 12,
     marginBottom: 16,
-    gap: 8,
+    // use margin between children instead of gap
     borderWidth: 1,
     borderColor: '#e1e5e9',
   },
@@ -400,7 +393,7 @@ const styles = StyleSheet.create({
   quickButtonsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 12,
+    // use Stack wrapper in markup for spacing or margins on children
   },
   quickSearchButton: {
     backgroundColor: '#f8f9fa',

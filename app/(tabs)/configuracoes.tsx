@@ -11,8 +11,12 @@ import {
 } from 'react-native';
 import { z } from 'zod';
 import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '../../src/contexts';
+import { useNavigation } from '@react-navigation/native';
 
 import { ControlledInput, ThemedText, ThemedView } from '../../src/components';
+import AppButton from '../../src/components/AppButton';
+import Stack from '../../src/components/Stack';
 import { useThemeCustom } from '../../src/contexts/theme';
 import { useAccentColor } from '../../src/styles/theme';
 import { useThemeColor } from '../../hooks/useThemeColor';
@@ -33,6 +37,8 @@ type ConfigForm = z.infer<typeof configSchema>;
 export default function ConfiguracoesScreen() {
   const { mode, setMode, effectiveTheme } = useThemeCustom();
   const { accentColor, saveAccentColor } = useAccentColor();
+  const { logout, isAuthenticated } = useAuth();
+  const navigation = useNavigation();
 
   const {
     control,
@@ -98,7 +104,7 @@ export default function ConfiguracoesScreen() {
                   </ThemedText>
                 </View>
               </View>
-              <View style={styles.themeOptions}>
+              <Stack direction="row" spacing={12} style={styles.themeOptions}>
                 <TouchableOpacity
                   style={[
                     styles.themeOption,
@@ -176,7 +182,7 @@ export default function ConfiguracoesScreen() {
                     <Ionicons name="checkmark-circle" size={16} color={accentColor} style={styles.checkIcon} />
                   )}
                 </TouchableOpacity>
-              </View>
+              </Stack>
             </View>
           </View>
         </View>
@@ -209,7 +215,7 @@ export default function ConfiguracoesScreen() {
 
                 <View style={styles.colorPresets}>
                   <ThemedText style={styles.presetsLabel}>Cores Predefinidas:</ThemedText>
-                  <View style={styles.presetsGrid}>
+                  <Stack direction="row" spacing={8} style={styles.presetsGrid}>
                     {[
                       { name: 'Laranja', color: '#FF6B35' },
                       { name: 'Azul', color: '#0A7EA4' },
@@ -231,7 +237,7 @@ export default function ConfiguracoesScreen() {
                         <ThemedText style={styles.presetButtonText}>{preset.name}</ThemedText>
                       </TouchableOpacity>
                     ))}
-                  </View>
+                  </Stack>
                 </View>
               </View>
             </View>
@@ -239,28 +245,31 @@ export default function ConfiguracoesScreen() {
         </View>
 
         {/* Save Button */}
-        <TouchableOpacity
-          style={[
-            styles.saveButton,
-            { backgroundColor: accentColor },
-            isSubmitting && styles.buttonDisabled,
-          ]}
-          onPress={handleSubmit(onSubmit)}
+        <AppButton
+          title="Salvar Alterações"
+          icon="checkmark"
+          loading={isSubmitting}
+          onPress={handleSubmit(onSubmit) as any}
+          style={[styles.saveButton, { backgroundColor: accentColor }]}
           disabled={isSubmitting}
-          activeOpacity={0.8}
-        >
-          {isSubmitting ? (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator color="white" size="small" />
-              <ThemedText style={styles.buttonText}>Salvando...</ThemedText>
-            </View>
-          ) : (
-            <View style={styles.buttonContent}>
-              <Ionicons name="checkmark" size={20} color="white" />
-              <ThemedText style={styles.buttonText}>Salvar Alterações</ThemedText>
-            </View>
-          )}
-        </TouchableOpacity>
+        />
+        {isAuthenticated && (
+          <AppButton
+            title="Sair"
+            variant="outline"
+            color={accentColor}
+            onPress={async () => {
+              try {
+                await logout();
+                // @ts-ignore
+                navigation.navigate('auth/login');
+              } catch (e) {
+                Alert.alert('Erro', 'Falha ao deslogar. Tente novamente.');
+              }
+            }}
+            style={[styles.logoutButton, { borderColor: accentColor }]}
+          />
+        )}
       </ThemedView>
     </ScrollView>
   );
@@ -306,7 +315,7 @@ const styles = StyleSheet.create({
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    // use marginRight on children instead of gap
     marginBottom: 12,
   },
   sectionTitle: {
@@ -327,7 +336,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   settingItem: {
-    gap: 16,
+    // spacing between items: use Stack or margins between children
   },
   settingLabel: {
     fontSize: 16,
@@ -343,7 +352,7 @@ const styles = StyleSheet.create({
   themeStatus: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    // use margin on icon/text instead of gap
     paddingHorizontal: 12,
     paddingVertical: 6,
     backgroundColor: 'rgba(255, 107, 53, 0.1)',
@@ -360,7 +369,7 @@ const styles = StyleSheet.create({
   },
   themeOptions: {
     flexDirection: 'row',
-    gap: 12,
+    // use Stack wrapper for spacing between options
   },
   themeOption: {
     flex: 1,
@@ -371,7 +380,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f9fa',
     borderWidth: 2,
     borderColor: 'transparent',
-    gap: 8,
+    // use margin on child elements instead of gap
   },
   themeOptionSelected: {
     backgroundColor: 'rgba(10, 126, 164, 0.1)',
@@ -382,12 +391,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   colorSection: {
-    gap: 16,
+    // use Stack or explicit margins for spacing
   },
   colorPreview: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    // use marginRight on color circle instead of gap
   },
   colorCircle: {
     width: 32,
@@ -432,13 +441,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
+    // use margin on icon/text instead of gap
   },
   loadingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
+    // spacing using margin between spinner and text
   },
   buttonText: {
     color: 'white',
@@ -447,7 +456,7 @@ const styles = StyleSheet.create({
   },
   colorPresets: {
     marginTop: 16,
-    gap: 12,
+    // spacing between presets handled by Stack in markup
   },
   presetsLabel: {
     fontSize: 14,
@@ -457,7 +466,7 @@ const styles = StyleSheet.create({
   presetsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
+    // use Stack or margin on child preset buttons
   },
   presetButton: {
     paddingVertical: 8,
@@ -469,6 +478,19 @@ const styles = StyleSheet.create({
   presetButtonText: {
     color: 'white',
     fontSize: 12,
+    fontWeight: '600',
+  },
+  logoutButton: {
+    marginTop: 16,
+    paddingVertical: 14,
+    borderRadius: 12,
+    borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'transparent',
+  },
+  logoutText: {
+    fontSize: 16,
     fontWeight: '600',
   },
 });
