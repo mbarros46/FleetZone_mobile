@@ -7,9 +7,9 @@ import Animated, {
   useScrollViewOffset,
 } from 'react-native-reanimated';
 
-import { ThemedView } from '@/components/ThemedView';
-import { useBottomTabOverflow } from '@/components/ui/TabBarBackground';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { ThemedView } from '../src/components/ThemedView';
+import { useBottomTabOverflow } from '../components/ui/TabBarBackground';
+import { useColorScheme } from '../hooks/useColorScheme';
 
 const HEADER_HEIGHT = 250;
 
@@ -82,7 +82,8 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     padding: 32,
-    gap: 16,
+    // Use Stack or explicit margins between children instead of gap
+    // gap is not supported consistently in React Native styles
     overflow: 'hidden',
   },
 });

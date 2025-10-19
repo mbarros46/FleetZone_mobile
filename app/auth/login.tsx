@@ -10,7 +10,9 @@ import {
   Platform,
   ScrollView,
 } from 'react-native';
-import { Link } from 'expo-router';
+import { useNavigation } from '@react-navigation/native';
+import { useAuth } from '../../src/contexts';
+import AppButton from '../../src/components/AppButton';
 import { useAccentColor } from '../../src/styles/theme';
 
 export default function LoginScreen() {
@@ -18,6 +20,8 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const { accentColor } = useAccentColor();
+  const navigation = useNavigation();
+  const { login } = useAuth();
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -27,15 +31,14 @@ export default function LoginScreen() {
 
     setLoading(true);
     try {
-      // Aqui você irá implementar a lógica do Firebase
-      // const result = await signInWithEmail(email, password);
-      console.log('Login attempt:', email);
-      
-      // Simular login por enquanto
-      Alert.alert('Sucesso', 'Login realizado com sucesso!');
-      // router.replace('/(tabs)'); // Implementar após configurar navegação
+  await login(email, password);
+  Alert.alert('Sucesso', 'Login realizado com sucesso!');
+  // navegar para as tabs principais
+  // @ts-ignore - navigation types depend on expo-router integration
+  navigation.navigate('(tabs)');
     } catch (error) {
-      Alert.alert('Erro', 'Falha no login. Verifique suas credenciais.');
+      const message = (error as any)?.message ?? 'Falha no login. Verifique suas credenciais.';
+      Alert.alert('Erro', message);
     } finally {
       setLoading(false);
     }
@@ -76,25 +79,26 @@ export default function LoginScreen() {
               />
             </View>
 
-            <TouchableOpacity
-              style={[styles.loginButton, { backgroundColor: accentColor }]}
+            <AppButton
+              title={loading ? 'Entrando...' : 'Entrar'}
+              loading={loading}
               onPress={handleLogin}
-              disabled={loading}
-            >
-              <Text style={styles.loginButtonText}>
-                {loading ? 'Entrando...' : 'Entrar'}
-              </Text>
-            </TouchableOpacity>
+              style={[styles.loginButton, { backgroundColor: accentColor }]}
+            />
 
             <View style={styles.registerContainer}>
               <Text style={styles.registerText}>Não tem uma conta? </Text>
-              <Link href="/auth/register" asChild>
-                <TouchableOpacity>
-                  <Text style={[styles.registerLink, { color: accentColor }]}>
-                    Cadastre-se
-                  </Text>
-                </TouchableOpacity>
-              </Link>
+              <AppButton
+                title="Cadastre-se"
+                variant="outline"
+                color={accentColor}
+                onPress={() => {
+                  // @ts-ignore
+                  navigation.navigate('auth/register');
+                }}
+                style={{ marginLeft: 8 }}
+                textStyle={{ fontSize: 14 }}
+              />
             </View>
           </View>
         </View>
@@ -131,10 +135,13 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   formContainer: {
-    gap: 20,
+    // `gap` não é compatível com todas as versões do React Native.
+    // Substituído por espaçamento manual entre elementos.
+    // Mantemos padding vertical onde necessário.
+    paddingVertical: 8,
   },
   inputContainer: {
-    gap: 8,
+    marginBottom: 12,
   },
   label: {
     fontSize: 16,

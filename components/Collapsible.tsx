@@ -27,7 +27,7 @@ export function Collapsible({
           size={18}
           weight="medium"
           color={theme === 'light' ? Colors.light.icon : Colors.dark.icon}
-          style={{ transform: [{ rotate: isOpen ? '90deg' : '0deg' }] }}
+          style={[{ transform: [{ rotate: isOpen ? '90deg' : '0deg' }], marginRight: 6 }]}
         />
 
         <ThemedText type="defaultSemiBold">{title}</ThemedText>
@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
   heading: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    // use margin on the icon instead of gap
   },
   content: {
     marginTop: 6,

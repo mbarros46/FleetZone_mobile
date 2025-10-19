@@ -3,7 +3,6 @@ import {
   View,
   Text,
   TextInput,
-  TouchableOpacity,
   StyleSheet,
   Alert,
   KeyboardAvoidingView,
@@ -11,6 +10,9 @@ import {
   ScrollView,
 } from 'react-native';
 import { useAccentColor } from '../../src/styles/theme';
+import { useNavigation } from '@react-navigation/native';
+import { useAuth } from '../../src/contexts';
+import AppButton from '../../src/components/AppButton';
 
 export default function RegisterScreen() {
   const [name, setName] = useState('');
@@ -19,6 +21,8 @@ export default function RegisterScreen() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const { accentColor } = useAccentColor();
+  const navigation = useNavigation();
+  const { register } = useAuth();
 
   const validateForm = () => {
     if (!name || !email || !password || !confirmPassword) {
@@ -50,35 +54,26 @@ export default function RegisterScreen() {
 
     setLoading(true);
     try {
-      // Aqui você irá implementar a lógica do Firebase
-      // const result = await signUpWithEmail(email, password);
-      console.log('Register attempt:', { name, email });
-      
-      // Simular cadastro por enquanto
-      Alert.alert(
-        'Sucesso', 
-        'Conta criada com sucesso! Faça login para continuar.',
-        [
-          {
-            text: 'OK',
-            onPress: () => console.log('Redirecionar para login')
-          }
-        ]
-      );
+      await register(name, email, password);
+      Alert.alert('Sucesso', 'Cadastro realizado com sucesso!');
+      // @ts-ignore - navigation types depend on expo-router integration
+      navigation.navigate('(tabs)');
     } catch (error) {
-      Alert.alert('Erro', 'Falha ao criar conta. Tente novamente.');
+      const message = (error as any)?.message ?? 'Falha no cadastro. Tente novamente.';
+      Alert.alert('Erro', message);
     } finally {
       setLoading(false);
     }
   };
 
   const goToLogin = () => {
-    console.log('Voltar para login');
+    // @ts-ignore
+    navigation.navigate('auth/login');
   };
 
   return (
-    <KeyboardAvoidingView 
-      style={styles.container} 
+    <KeyboardAvoidingView
+      style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -133,23 +128,23 @@ export default function RegisterScreen() {
               />
             </View>
 
-            <TouchableOpacity
-              style={[styles.registerButton, { backgroundColor: accentColor }]}
+            <AppButton
+              title={loading ? 'Criando conta...' : 'Criar Conta'}
+              loading={loading}
               onPress={handleRegister}
-              disabled={loading}
-            >
-              <Text style={styles.registerButtonText}>
-                {loading ? 'Criando conta...' : 'Criar Conta'}
-              </Text>
-            </TouchableOpacity>
+              style={[styles.registerButton, { backgroundColor: accentColor }]}
+            />
 
             <View style={styles.loginContainer}>
               <Text style={styles.loginText}>Já tem uma conta? </Text>
-              <TouchableOpacity onPress={goToLogin}>
-                <Text style={[styles.loginLink, { color: accentColor }]}>
-                  Faça login
-                </Text>
-              </TouchableOpacity>
+              <AppButton
+                title="Faça login"
+                variant="outline"
+                color={accentColor}
+                onPress={goToLogin}
+                style={{ marginLeft: 8 }}
+                textStyle={{ fontSize: 14 }}
+              />
             </View>
           </View>
         </View>
@@ -159,74 +154,16 @@ export default function RegisterScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#ffffff',
-  },
-  scrollContainer: {
-    flexGrow: 1,
-    justifyContent: 'center',
-  },
-  content: {
-    flex: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 40,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 8,
-    color: '#333',
-  },
-  subtitle: {
-    fontSize: 16,
-    textAlign: 'center',
-    color: '#666',
-    marginBottom: 40,
-  },
-  formContainer: {
-    gap: 20,
-  },
-  inputContainer: {
-    gap: 8,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#333',
-  },
-  input: {
-    borderWidth: 1.5,
-    borderRadius: 8,
-    padding: 16,
-    fontSize: 16,
-    backgroundColor: '#f9f9f9',
-  },
-  registerButton: {
-    padding: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  registerButtonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  loginContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  loginText: {
-    fontSize: 14,
-    color: '#666',
-  },
-  loginLink: {
-    fontSize: 14,
-    fontWeight: '600',
-  },
+  container: { flex: 1, backgroundColor: '#ffffff' },
+  scrollContainer: { flexGrow: 1, justifyContent: 'center' },
+  content: { flex: 1, justifyContent: 'center', paddingHorizontal: 24, paddingVertical: 40 },
+  title: { fontSize: 32, fontWeight: 'bold', textAlign: 'center', marginBottom: 8, color: '#333' },
+  subtitle: { fontSize: 16, textAlign: 'center', color: '#666', marginBottom: 40 },
+  formContainer: { paddingVertical: 8 },
+  inputContainer: { marginBottom: 12 },
+  label: { fontSize: 16, fontWeight: '500', color: '#333' },
+  input: { borderWidth: 1.5, borderRadius: 8, padding: 16, fontSize: 16, backgroundColor: '#f9f9f9' },
+  registerButton: { padding: 16, borderRadius: 8, alignItems: 'center', marginTop: 10 },
+  loginContainer: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 20 },
+  loginText: { fontSize: 14, color: '#666' },
 });
