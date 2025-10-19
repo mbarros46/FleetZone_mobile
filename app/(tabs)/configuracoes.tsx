@@ -20,6 +20,9 @@ import Stack from '../../src/components/Stack';
 import { useThemeCustom } from '../../src/contexts/theme';
 import { useAccentColor } from '../../src/styles/theme';
 import { useThemeColor } from '../../hooks/useThemeColor';
+import { useState, useEffect as useEffectReact } from 'react';
+import { registerForPushNotificationsAsync, getSavedPushToken, sendTestPushNotification } from '../../src/services/notifications';
+import { t, getDeviceLang } from '../../src/i18n';
 
 const configSchema = z.object({
   corDestaque: z
@@ -39,6 +42,16 @@ export default function ConfiguracoesScreen() {
   const { accentColor, saveAccentColor } = useAccentColor();
   const { logout, isAuthenticated } = useAuth();
   const navigation = useNavigation();
+
+  const [pushToken, setPushToken] = useState<string | null>(null);
+  const [sending, setSending] = useState(false);
+
+  useEffectReact(() => {
+    (async () => {
+      const token = await getSavedPushToken();
+      setPushToken(token);
+    })();
+  }, []);
 
   const {
     control,
@@ -270,6 +283,50 @@ export default function ConfiguracoesScreen() {
             style={[styles.logoutButton, { borderColor: accentColor }]}
           />
         )}
+        <AppButton
+          title="Sobre o App"
+          variant="outline"
+          color={accentColor}
+          onPress={() => {
+            // @ts-ignore - expo-router types
+            navigation.navigate('configuracoes/sobre');
+          }}
+          style={[styles.aboutButton, { borderColor: accentColor, marginTop: 12 }]}
+        />
+
+        <AppButton
+          title={pushToken ? 'Token registrado' : 'Registrar Notificações'}
+          variant={pushToken ? 'outline' : 'solid'}
+          color={accentColor}
+          onPress={async () => {
+            try {
+              const token = await registerForPushNotificationsAsync();
+              setPushToken(token);
+              Alert.alert(t('register_success', getDeviceLang()));
+            } catch (e: any) {
+              Alert.alert(t('register_fail', getDeviceLang()), String(e?.message ?? e));
+            }
+          }}
+          style={{ marginTop: 12 }}
+        />
+
+        <AppButton
+          title="Enviar Notificação de Teste"
+          color={accentColor}
+          onPress={async () => {
+            setSending(true);
+            try {
+              await sendTestPushNotification(pushToken ?? undefined);
+              Alert.alert('Ok', 'Notificação enviada (verifique seu dispositivo)');
+            } catch (e: any) {
+              Alert.alert('Erro', String(e?.message ?? e));
+            } finally {
+              setSending(false);
+            }
+          }}
+          loading={sending}
+          style={{ marginTop: 8 }}
+        />
       </ThemedView>
     </ScrollView>
   );
@@ -289,6 +346,10 @@ const styles = StyleSheet.create({
     paddingTop: 40,
     paddingBottom: 32,
   },
+    aboutButton: {
+      paddingVertical: 12,
+      borderRadius: 8,
+    },
   iconContainer: {
     width: 64,
     height: 64,
