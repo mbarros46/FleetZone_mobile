@@ -13,6 +13,8 @@ import { useAccentColor } from '../../src/styles/theme';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../../src/contexts';
 import AppButton from '../../src/components/AppButton';
+import { useLanguage } from '../../src/contexts';
+import { t } from '../../src/i18n';
 
 export default function RegisterScreen() {
   const [name, setName] = useState('');
@@ -23,10 +25,11 @@ export default function RegisterScreen() {
   const { accentColor } = useAccentColor();
   const navigation = useNavigation();
   const { register } = useAuth();
+  const { lang } = useLanguage();
 
   const validateForm = () => {
     if (!name || !email || !password || !confirmPassword) {
-      Alert.alert('Erro', 'Por favor, preencha todos os campos');
+      Alert.alert('Erro', t('fill_data', lang));
       return false;
     }
 
@@ -78,12 +81,12 @@ export default function RegisterScreen() {
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.content}>
-          <Text style={styles.title}>Criar Conta</Text>
-          <Text style={styles.subtitle}>Preencha os dados para se cadastrar</Text>
+          <Text style={styles.title}>{t('create_account', lang)}</Text>
+          <Text style={styles.subtitle}>{t('fill_data', lang)}</Text>
 
           <View style={styles.formContainer}>
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Nome Completo</Text>
+              <Text style={styles.label}>{t('name_label', lang)}</Text>
               <TextInput
                 style={[styles.input, { borderColor: accentColor }]}
                 placeholder="Seu nome completo"
@@ -94,7 +97,7 @@ export default function RegisterScreen() {
             </View>
 
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Email</Text>
+              <Text style={styles.label}>{t('email_label', lang)}</Text>
               <TextInput
                 style={[styles.input, { borderColor: accentColor }]}
                 placeholder="seu@email.com"
@@ -107,7 +110,7 @@ export default function RegisterScreen() {
             </View>
 
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Senha</Text>
+              <Text style={styles.label}>{t('password_label', lang)}</Text>
               <TextInput
                 style={[styles.input, { borderColor: accentColor }]}
                 placeholder="Mínimo 6 caracteres"
@@ -118,7 +121,7 @@ export default function RegisterScreen() {
             </View>
 
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Confirmar Senha</Text>
+              <Text style={styles.label}>{t('confirm_password_label', lang)}</Text>
               <TextInput
                 style={[styles.input, { borderColor: accentColor }]}
                 placeholder="Digite a senha novamente"
@@ -129,14 +132,14 @@ export default function RegisterScreen() {
             </View>
 
             <AppButton
-              title={loading ? 'Criando conta...' : 'Criar Conta'}
+              title={loading ? t('create_account', lang) + '...' : t('create_account', lang)}
               loading={loading}
               onPress={handleRegister}
               style={[styles.registerButton, { backgroundColor: accentColor }]}
             />
 
             <View style={styles.loginContainer}>
-              <Text style={styles.loginText}>Já tem uma conta? </Text>
+              <Text style={styles.loginText}>{lang === 'es' ? '¿Ya tienes una cuenta?' : 'Já tem uma conta? '}</Text>
               <AppButton
                 title="Faça login"
                 variant="outline"

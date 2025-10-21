@@ -22,7 +22,8 @@ import { useAccentColor } from '../../src/styles/theme';
 import { useThemeColor } from '../../hooks/useThemeColor';
 import { useState, useEffect as useEffectReact } from 'react';
 import { registerForPushNotificationsAsync, getSavedPushToken, sendTestPushNotification } from '../../src/services/notifications';
-import { t, getDeviceLang } from '../../src/i18n';
+import { t } from '../../src/i18n';
+import { useLanguage } from '../../src/contexts';
 
 const configSchema = z.object({
   corDestaque: z
@@ -45,6 +46,7 @@ export default function ConfiguracoesScreen() {
 
   const [pushToken, setPushToken] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
+  const { lang, setLang } = useLanguage();
 
   useEffectReact(() => {
     (async () => {
@@ -79,7 +81,7 @@ export default function ConfiguracoesScreen() {
   };
 
   return (
-    <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+    <ScrollView contentContainerStyle={styles.scrollContent} style={styles.scrollView} showsVerticalScrollIndicator={false}>
       <ThemedView style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
@@ -302,9 +304,9 @@ export default function ConfiguracoesScreen() {
             try {
               const token = await registerForPushNotificationsAsync();
               setPushToken(token);
-              Alert.alert(t('register_success', getDeviceLang()));
+                      Alert.alert(t('register_success', lang));
             } catch (e: any) {
-              Alert.alert(t('register_fail', getDeviceLang()), String(e?.message ?? e));
+                      Alert.alert(t('register_fail', lang), String(e?.message ?? e));
             }
           }}
           style={{ marginTop: 12 }}
@@ -327,6 +329,40 @@ export default function ConfiguracoesScreen() {
           loading={sending}
           style={{ marginTop: 8 }}
         />
+
+        {/* Language selector */}
+        <View style={styles.languageSelector}>
+          <ThemedText style={{ marginBottom: 8, fontWeight: '600' }}>{t('language_label', lang)}</ThemedText>
+          <Stack direction="row" spacing={12}>
+            <TouchableOpacity
+              onPress={async () => {
+                await setLang('pt');
+                Alert.alert('Idioma', 'Português selecionado');
+              }}
+              style={[styles.themeOption, lang === 'pt' && styles.themeOptionSelected]}
+              accessibilityLabel="Selecionar Português"
+              accessible
+              activeOpacity={0.7}
+            >
+              <ThemedText style={[styles.themeOptionText, lang === 'pt' && { color: accentColor }]}>Português</ThemedText>
+              {lang === 'pt' && <Ionicons name="checkmark-circle" size={16} color={accentColor} style={styles.checkIcon} />}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={async () => {
+                await setLang('es');
+                Alert.alert('Idioma', 'Español seleccionado');
+              }}
+              style={[styles.themeOption, lang === 'es' && styles.themeOptionSelected]}
+              accessibilityLabel="Seleccionar Español"
+              accessible
+              activeOpacity={0.7}
+            >
+              <ThemedText style={[styles.themeOptionText, lang === 'es' && { color: accentColor }]}>Español</ThemedText>
+              {lang === 'es' && <Ionicons name="checkmark-circle" size={16} color={accentColor} style={styles.checkIcon} />}
+            </TouchableOpacity>
+          </Stack>
+        </View>
       </ThemedView>
     </ScrollView>
   );
@@ -338,8 +374,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#fafafa',
   },
   container: {
-    flex: 1,
     paddingHorizontal: 20,
+  },
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingTop: 0,
+    paddingBottom: 48,
+    backgroundColor: '#fafafa',
   },
   header: {
     alignItems: 'center',
@@ -433,7 +474,8 @@ const styles = StyleSheet.create({
     // use Stack wrapper for spacing between options
   },
   themeOption: {
-    flex: 1,
+    flexGrow: 0,
+    minWidth: 100,
     alignItems: 'center',
     paddingVertical: 16,
     paddingHorizontal: 12,
@@ -442,9 +484,14 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: 'transparent',
     // use margin on child elements instead of gap
+    pointerEvents: 'auto',
   },
   themeOptionSelected: {
     backgroundColor: 'rgba(10, 126, 164, 0.1)',
+  },
+  languageSelector: {
+    marginTop: 16,
+    marginBottom: 24,
   },
   themeOptionText: {
     fontSize: 14,

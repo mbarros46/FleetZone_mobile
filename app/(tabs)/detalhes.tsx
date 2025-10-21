@@ -13,6 +13,8 @@ import { z } from 'zod';
 import { Ionicons } from '@expo/vector-icons';
 
 import { ControlledInput, ThemedText, ThemedView } from '../../src/components';
+import { useLanguage } from '../../src/contexts';
+import { t } from '../../src/i18n';
 import AppButton from '../../src/components/AppButton';
 import Stack from '../../src/components/Stack';
 import { useAccentColor } from '../../src/styles/theme';
@@ -54,6 +56,7 @@ export default function DetalhesScreen() {
     (typeof motosMock)[0] | null
   >(null);
   const { accentColor } = useAccentColor();
+  const { lang } = useLanguage();
 
   const {
     control,
@@ -79,10 +82,10 @@ export default function DetalhesScreen() {
         setMotoSelecionada(moto);
       } else {
         setMotoSelecionada(null);
-        Alert.alert('Moto não encontrada', 'Verifique a chave/placa digitada.');
+        Alert.alert(t('not_found_label', lang), t('not_found_message', lang));
       }
     } catch (error) {
-      Alert.alert('Erro', 'Não foi possível buscar a moto. Tente novamente.');
+      Alert.alert(t('error_label', lang), t('search_fail', lang));
     }
   };
 

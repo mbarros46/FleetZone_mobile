@@ -20,6 +20,8 @@ import { useAccentColor } from '../../src/styles/theme';
 import { useThemeColor } from '../../hooks/useThemeColor';
 import { motosService } from '../../src/services/motosService';
 import { useAuth } from '../../src/contexts/auth';
+import { useLanguage } from '../../src/contexts';
+import { t } from '../../src/i18n';
 
 const motoSchema = z.object({
   modelo: z
@@ -47,6 +49,7 @@ export default function FormularioScreen() {
   const cardColor = useThemeColor({}, 'card');
   const borderColor = useThemeColor({}, 'border');
   const { token } = useAuth();
+  const { lang } = useLanguage();
 
   const navigation = useNavigation();
   const route = useRoute<RouteProp<Record<string, FormularioRouteParams>, string>>();
@@ -86,7 +89,7 @@ export default function FormularioScreen() {
           status: moto.status ?? undefined,
         });
       } catch (e: any) {
-        Alert.alert('Erro', e?.message ?? 'Falha ao carregar moto');
+    Alert.alert(t('error_label', lang), e?.message ?? t('load_moto_fail', lang));
       } finally {
         if (isMounted) setLoadingMoto(false);
       }
@@ -113,7 +116,7 @@ export default function FormularioScreen() {
         await motosService.create(payload, token ?? undefined);
       }
 
-      Alert.alert('Sucesso', 'Dados salvos!', [
+      Alert.alert(t('success_label', lang), t('data_saved', lang), [
         {
           text: 'OK',
           onPress: () => {
@@ -126,7 +129,7 @@ export default function FormularioScreen() {
         },
       ]);
     } catch (e: any) {
-      Alert.alert('Erro', e?.message ?? 'Falha ao salvar');
+  Alert.alert(t('error_label', lang), e?.message ?? t('save_fail', lang));
     } finally {
       setSaving(false);
     }
@@ -149,24 +152,24 @@ export default function FormularioScreen() {
             <Ionicons name={editingId ? 'create' : 'add-circle'} size={32} color={accentColor} />
           </View>
           <ThemedText type="title" style={styles.title}>
-            {editingId ? 'Editar Moto' : 'Cadastrar Nova Moto'}
-          </ThemedText>
-          <ThemedText style={styles.subtitle}>
-            Preencha os dados abaixo para {editingId ? 'atualizar' : 'adicionar'} a motocicleta na frota
-          </ThemedText>
+              {editingId ? t('edit_moto', lang) : t('create_moto', lang)}
+            </ThemedText>
+            <ThemedText style={styles.subtitle}>
+              {t('fill_moto_data', lang)}
+            </ThemedText>
         </View>
 
         <ThemedView style={[styles.formCard, { backgroundColor: cardColor, borderColor: borderColor }]}>
           <View style={styles.formHeader}>
             <Ionicons name="document-text" size={20} color={accentColor} />
-            <ThemedText style={styles.formTitle}>Informações da Moto</ThemedText>
+            <ThemedText style={styles.formTitle}>{t('moto_info', lang)}</ThemedText>
           </View>
 
           <Stack spacing={20} style={styles.form}>
             <View>
               <View style={styles.inputHeader}>
                 <Ionicons name="car-sport" size={16} color="#666" style={{ marginRight: 8 }} />
-                <ThemedText style={styles.inputLabel}>Modelo</ThemedText>
+                <ThemedText style={styles.inputLabel}>{t('modelo_label', lang)}</ThemedText>
               </View>
               <ControlledInput
                 name="modelo"
@@ -182,7 +185,7 @@ export default function FormularioScreen() {
             <View>
               <View style={styles.inputHeader}>
                 <Ionicons name="document" size={16} color="#666" style={{ marginRight: 8 }} />
-                <ThemedText style={styles.inputLabel}>Placa</ThemedText>
+                <ThemedText style={styles.inputLabel}>{t('placa_label', lang)}</ThemedText>
               </View>
               <ControlledInput
                 name="placa"
@@ -199,7 +202,7 @@ export default function FormularioScreen() {
             <View>
               <View style={styles.inputHeader}>
                 <Ionicons name="bar-chart" size={16} color="#666" style={{ marginRight: 8 }} />
-                <ThemedText style={styles.inputLabel}>Status (opcional)</ThemedText>
+                <ThemedText style={styles.inputLabel}>{t('status_label', lang)}</ThemedText>
               </View>
               <ControlledInput
                 name="status"
@@ -214,7 +217,7 @@ export default function FormularioScreen() {
           </Stack>
 
             <AppButton
-              title={editingId ? 'Atualizar Moto' : 'Cadastrar Moto'}
+              title={editingId ? t('update_moto', lang) : t('create_moto', lang)}
               icon="checkmark"
               loading={saving}
               onPress={handleSubmit(onSubmit) as any}
@@ -229,7 +232,7 @@ export default function FormularioScreen() {
               color="#666"
               onPress={() => {
                 reset({ modelo: '', placa: '', status: undefined });
-                Alert.alert('Formulário Limpo', 'Os campos foram limpos. Você pode preencher novamente.');
+                Alert.alert(t('info_label', lang), t('form_cleared', lang));
               }}
               style={styles.clearButton}
             />

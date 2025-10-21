@@ -10,6 +10,8 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText, ThemedView } from '../../src/components';
+import { useLanguage } from '../../src/contexts';
+import { t } from '../../src/i18n';
 import { useNavigation } from '@react-navigation/native';
 import { useAccentColor } from '../../src/styles/theme';
 import { useThemeColor } from '../../hooks/useThemeColor';
@@ -20,6 +22,7 @@ export default function MotosScreen() {
   const { accentColor } = useAccentColor();
   const textColor = useThemeColor({}, 'text');
   const { token } = useAuth();
+  const { lang } = useLanguage();
 
   const [data, setData] = useState<MotoDTO[]>([]);
   const [loading, setLoading] = useState(true);
@@ -34,9 +37,9 @@ export default function MotosScreen() {
       const list = await motosService.list(token ?? undefined);
       setData(list);
     } catch (e: any) {
-      const msg = e?.message ?? 'Falha ao carregar motos';
+      const msg = e?.message ?? t('load_motos_fail', lang);
       setError(msg);
-      Alert.alert('Erro', msg);
+      Alert.alert(t('error_label', lang), msg);
     } finally {
       setLoading(false);
     }
@@ -54,17 +57,17 @@ export default function MotosScreen() {
 
   const remove = async (id?: number) => {
     if (!id) return;
-    Alert.alert('Excluir', 'Confirmar exclusão desta moto?', [
-      { text: 'Cancelar', style: 'cancel' },
+    Alert.alert(t('delete_label', lang), t('delete_confirm', lang), [
+      { text: t('cancel_label', lang), style: 'cancel' },
       {
-        text: 'Excluir',
+        text: t('delete_label', lang),
         style: 'destructive',
         onPress: async () => {
           try {
             await motosService.remove(id, token ?? undefined);
             await load();
           } catch (e: any) {
-            Alert.alert('Erro', e.message ?? 'Falha ao excluir');
+            Alert.alert(t('error_label', lang), e.message ?? t('delete_fail', lang));
           }
         },
       },

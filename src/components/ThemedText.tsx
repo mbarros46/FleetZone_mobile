@@ -1,11 +1,14 @@
 import { Text, type TextProps, StyleSheet } from 'react-native';
 
 import { useThemeColor } from '../../hooks/useThemeColor';
+import { useLanguage } from '../contexts';
+import { t } from '../i18n';
 
 export type ThemedTextProps = TextProps & {
   lightColor?: string;
   darkColor?: string;
   type?: 'default' | 'title' | 'defaultSemiBold' | 'subtitle' | 'link' | 'caption' | 'heading';
+  i18nKey?: string;
 };
 
 export function ThemedText({
@@ -13,9 +16,25 @@ export function ThemedText({
   lightColor,
   darkColor,
   type = 'default',
+  i18nKey,
   ...rest
 }: ThemedTextProps) {
   const color = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
+  let translatedProps: Partial<typeof rest> = {} as any;
+  try {
+    const { lang } = useLanguage();
+    if (i18nKey) {
+      // override children with the translated string
+      // @ts-ignore
+      translatedProps.children = t(i18nKey, lang);
+    }
+  } catch (e) {
+    // if useLanguage isn't available yet, fallback to static t
+    if (i18nKey) {
+      // @ts-ignore
+      translatedProps.children = t(i18nKey);
+    }
+  }
 
   return (
     <Text
@@ -31,6 +50,7 @@ export function ThemedText({
         style,
       ]}
       {...rest}
+      {...translatedProps}
     />
   );
 }

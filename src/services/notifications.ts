@@ -2,7 +2,7 @@ import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { t, getDeviceLang } from '../i18n';
+import { t, getAppLang } from '../i18n';
 
 const PUSH_TOKEN_KEY = '@FleetZone:pushToken';
 
@@ -40,8 +40,7 @@ export async function getSavedPushToken() {
 export async function sendTestPushNotification(expoPushToken?: string) {
   const token = expoPushToken ?? (await getSavedPushToken());
   if (!token) throw new Error('No push token available');
-
-  const lang = getDeviceLang();
+  const lang = await getAppLang();
 
   const message = {
     to: token,

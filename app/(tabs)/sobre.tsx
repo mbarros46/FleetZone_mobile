@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Platform } from 'react-native';
 import { useAccentColor } from '../../src/styles/theme';
+import { getAppLang, t, setAppLang } from '../../src/i18n';
+import AppButton from '../../src/components/AppButton';
 
 async function readCommitHash(): Promise<string | null> {
   try {
@@ -55,6 +57,15 @@ async function readCommitHash(): Promise<string | null> {
 export default function SobreScreen() {
   const [commitHash, setCommitHash] = useState<string | null>(null);
   const { accentColor } = useAccentColor();
+  const [lang, setLang] = useState<'pt'|'es'|'en'>('pt');
+
+  useEffect(() => {
+    let mounted = true;
+    getAppLang().then((l) => {
+      if (mounted) setLang(l as any);
+    });
+    return () => { mounted = false; };
+  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -68,15 +79,24 @@ export default function SobreScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.card}>
-        <Text style={[styles.title, { color: accentColor }]}>Sobre o App</Text>
-        <Text style={styles.label}>Hash do commit de referência:</Text>
-        <Text style={styles.hash}>{commitHash ?? 'desconhecido'}</Text>
-        <Text style={styles.note}>
-          Esse valor é buscado em `app.json` (extra.commitHash), `package.json` (gitHead) ou no arquivo
-          `COMMIT_HASH` na raiz quando disponível.
-        </Text>
-      </View>
+        <View style={styles.card}>
+          <Text style={[styles.title, { color: accentColor }]}>{t('about_title', lang)}</Text>
+          <Text style={styles.label}>{t('about_commit_label', lang)}</Text>
+          <Text style={styles.hash}>{commitHash ?? (lang === 'es' ? 'desconocido' : lang === 'en' ? 'unknown' : 'desconhecido')}</Text>
+          <Text style={styles.note}>{t('about_note', lang)}</Text>
+
+          <AppButton
+            title={lang === 'pt' ? 'Español' : 'Português'}
+            variant="outline"
+            color={accentColor}
+            onPress={async () => {
+              const target = lang === 'pt' ? 'es' : 'pt';
+              await setAppLang(target as any);
+              setLang(target as any);
+            }}
+            style={{ marginTop: 12 }}
+          />
+        </View>
     </ScrollView>
   );
 }

@@ -12,6 +12,8 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../../src/contexts';
+import { useLanguage } from '../../src/contexts';
+import { t } from '../../src/i18n';
 import AppButton from '../../src/components/AppButton';
 import { useAccentColor } from '../../src/styles/theme';
 
@@ -22,17 +24,18 @@ export default function LoginScreen() {
   const { accentColor } = useAccentColor();
   const navigation = useNavigation();
   const { login } = useAuth();
+  const { lang } = useLanguage();
 
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert('Erro', 'Por favor, preencha todos os campos');
+      Alert.alert('Erro', t('fill_data', lang));
       return;
     }
 
     setLoading(true);
     try {
   await login(email, password);
-  Alert.alert('Sucesso', 'Login realizado com sucesso!');
+  Alert.alert('Sucesso', t('enter', lang));
   // navegar para as tabs principais
   // @ts-ignore - navigation types depend on expo-router integration
   navigation.navigate('(tabs)');
@@ -52,11 +55,11 @@ export default function LoginScreen() {
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.content}>
           <Text style={styles.title}>FleetZone</Text>
-          <Text style={styles.subtitle}>Faça login para continuar</Text>
+          <Text style={styles.subtitle}>{t('login_subtitle', lang)}</Text>
 
           <View style={styles.formContainer}>
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Email</Text>
+              <Text style={styles.label}>{t('email_label', lang)}</Text>
               <TextInput
                 style={[styles.input, { borderColor: accentColor }]}
                 placeholder="seu@email.com"
@@ -69,7 +72,7 @@ export default function LoginScreen() {
             </View>
 
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Senha</Text>
+              <Text style={styles.label}>{t('password_label', lang)}</Text>
               <TextInput
                 style={[styles.input, { borderColor: accentColor }]}
                 placeholder="Sua senha"
@@ -80,16 +83,16 @@ export default function LoginScreen() {
             </View>
 
             <AppButton
-              title={loading ? 'Entrando...' : 'Entrar'}
+              title={loading ? t('enter', lang) + '...' : t('enter', lang)}
               loading={loading}
               onPress={handleLogin}
               style={[styles.loginButton, { backgroundColor: accentColor }]}
             />
 
             <View style={styles.registerContainer}>
-              <Text style={styles.registerText}>Não tem uma conta? </Text>
+              <Text style={styles.registerText}>{lang === 'es' ? '¿No tienes una cuenta?' : 'Não tem uma conta? '}</Text>
               <AppButton
-                title="Cadastre-se"
+                title={t('register', lang)}
                 variant="outline"
                 color={accentColor}
                 onPress={() => {
