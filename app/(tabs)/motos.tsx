@@ -8,6 +8,8 @@ import {
   RefreshControl,
   ActivityIndicator,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useBottomTabOverflow } from '../../components/ui/TabBarBackground';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText, ThemedView } from '../../src/components';
 import { useLanguage } from '../../src/contexts';
@@ -29,6 +31,8 @@ export default function MotosScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
+  const bottomOverflow = useBottomTabOverflow?.() ?? 0;
 
   const load = useCallback(async () => {
     try {
@@ -84,7 +88,7 @@ export default function MotosScreen() {
   }
 
   return (
-    <ThemedView style={styles.container}>
+    <ThemedView style={[styles.container, { paddingTop: insets.top }] }>
       <FlatList
         data={data}
         keyExtractor={(item, index) => String(item.id ?? index)}
@@ -141,9 +145,10 @@ export default function MotosScreen() {
             </ThemedText>
           )
         }
+        contentContainerStyle={{ paddingBottom: 24 + insets.bottom + bottomOverflow }}
       />
       <TouchableOpacity
-        style={[styles.fab, { backgroundColor: accentColor }]}
+        style={[styles.fab, { backgroundColor: accentColor, bottom: 16 + insets.bottom + bottomOverflow }]}
         onPress={() => {
           // @ts-ignore - navegar para o formulário (criação)
           navigation.navigate('formulario');

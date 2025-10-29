@@ -1,19 +1,24 @@
-import { Link, Stack } from 'expo-router';
 import { StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 import { ThemedText, ThemedView } from '../src/components';
+import AppButton from '../src/components/AppButton';
 
 export default function NotFoundScreen() {
+  const navigation = useNavigation();
+
   return (
-    <>
-      <Stack.Screen options={{ title: 'Oops!' }} />
-      <ThemedView style={styles.container}>
-        <ThemedText type="title">This screen doesn't exist.</ThemedText>
-        <Link href="/" style={styles.link}>
-          <ThemedText type="link">Go to home screen!</ThemedText>
-        </Link>
-      </ThemedView>
-    </>
+    <ThemedView style={styles.container}>
+      <ThemedText type="title">This screen doesn't exist.</ThemedText>
+      <AppButton
+        title="Ir para início"
+        onPress={() => {
+          // @ts-ignore - navigation types depend on router setup
+          navigation.navigate('(tabs)');
+        }}
+        style={styles.link}
+      />
+    </ThemedView>
   );
 }
 

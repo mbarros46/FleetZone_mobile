@@ -1,24 +1,52 @@
-import { Link } from 'expo-router';
+import React from 'react';
+import { TouchableOpacity, Platform, Linking, Text, StyleSheet, GestureResponderEvent } from 'react-native';
 import { openBrowserAsync } from 'expo-web-browser';
-import { type ComponentProps } from 'react';
-import { Platform } from 'react-native';
 
-type Props = Omit<ComponentProps<typeof Link>, 'href'> & { href: string };
+type Props = {
+  href: string;
+  children?: React.ReactNode;
+  style?: any;
+  accessibilityLabel?: string;
+};
 
-export function ExternalLink({ href, ...rest }: Props) {
+export function ExternalLink({ href, children, style, accessibilityLabel }: Props) {
+  const handlePress = async (event?: GestureResponderEvent) => {
+    try {
+      if (Platform.OS === 'web') {
+        // On web, use the native navigation
+        window.open(href, '_blank');
+        return;
+      }
+
+      // On native, try to open using the in-app browser first
+      const supported = await Linking.canOpenURL(href);
+      if (!supported) {
+        await openBrowserAsync(href);
+        return;
+      }
+
+      // Prefer Linking to let the device handle external apps if available
+      await Linking.openURL(href);
+    } catch (err) {
+      // Last resort: open in in-app browser
+      try {
+        await openBrowserAsync(href);
+      } catch (e) {
+        console.warn('[ExternalLink] failed to open url', href, e);
+      }
+    }
+  };
+
   return (
-    <Link
-      target="_blank"
-      {...rest}
-      href={href}
-      onPress={async (event) => {
-        if (Platform.OS !== 'web') {
-          // Prevent the default behavior of linking to the default browser on native.
-          event.preventDefault();
-          // Open the link in an in-app browser.
-          await openBrowserAsync(href);
-        }
-      }}
-    />
+    <TouchableOpacity onPress={handlePress} style={style} accessibilityLabel={accessibilityLabel}>
+      {children ?? <Text style={styles.link}>{href}</Text>}
+    </TouchableOpacity>
   );
 }
+
+const styles = StyleSheet.create({
+  link: {
+    color: '#1B95E0',
+    textDecorationLine: 'underline',
+  },
+});

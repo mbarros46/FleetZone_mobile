@@ -8,6 +8,8 @@ import {
   ScrollView,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useBottomTabOverflow } from '../../components/ui/TabBarBackground';
 import { useForm, type SubmitHandler, type Resolver } from 'react-hook-form';
 import { z } from 'zod';
 import { Ionicons } from '@expo/vector-icons';
@@ -50,6 +52,8 @@ export default function FormularioScreen() {
   const borderColor = useThemeColor({}, 'border');
   const { token } = useAuth();
   const { lang } = useLanguage();
+  const insets = useSafeAreaInsets();
+  const bottomOverflow = useBottomTabOverflow?.() ?? 0;
 
   const navigation = useNavigation();
   const route = useRoute<RouteProp<Record<string, FormularioRouteParams>, string>>();
@@ -145,8 +149,12 @@ export default function FormularioScreen() {
   }
 
   return (
-    <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-      <ThemedView style={styles.container}>
+    <ScrollView
+      style={[styles.scrollView, { paddingTop: insets.top }]}
+      contentContainerStyle={{ paddingBottom: 24 + insets.bottom + bottomOverflow }}
+      showsVerticalScrollIndicator={false}
+    >
+      <ThemedView style={[styles.container, { paddingBottom: insets.bottom + bottomOverflow }]}>
         <View style={styles.header}>
           <View style={[styles.iconContainer, { backgroundColor: `${accentColor}20` }]}>
             <Ionicons name={editingId ? 'create' : 'add-circle'} size={32} color={accentColor} />

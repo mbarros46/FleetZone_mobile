@@ -9,6 +9,8 @@ import {
   ScrollView,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useBottomTabOverflow } from '../../components/ui/TabBarBackground';
 import { z } from 'zod';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../src/contexts';
@@ -47,6 +49,8 @@ export default function ConfiguracoesScreen() {
   const [pushToken, setPushToken] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
   const { lang, setLang } = useLanguage();
+  const insets = useSafeAreaInsets();
+  const bottomOverflow = useBottomTabOverflow?.() ?? 0;
 
   useEffectReact(() => {
     (async () => {
@@ -81,8 +85,15 @@ export default function ConfiguracoesScreen() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollContent} style={styles.scrollView} showsVerticalScrollIndicator={false}>
-      <ThemedView style={styles.container}>
+    <ScrollView
+      contentContainerStyle={[
+        styles.scrollContent,
+        { paddingBottom: (styles.scrollContent.paddingBottom ?? 48) + insets.bottom + bottomOverflow },
+      ]}
+      style={[styles.scrollView, { paddingTop: insets.top }]}
+      showsVerticalScrollIndicator={false}
+    >
+      <ThemedView style={[styles.container, { paddingBottom: insets.bottom + bottomOverflow }]}>
         {/* Header */}
         <View style={styles.header}>
           <View style={[styles.iconContainer, { backgroundColor: `${accentColor}20` }]}>
@@ -276,8 +287,9 @@ export default function ConfiguracoesScreen() {
             onPress={async () => {
               try {
                 await logout();
-                // @ts-ignore
-                navigation.navigate('auth/login');
+                // Resetamos a navegação para remover a pilha de telas autenticadas
+                // @ts-ignore - tipos dependem da configuração do router
+                navigation.reset({ index: 0, routes: [{ name: 'auth/login' }] });
               } catch (e) {
                 Alert.alert('Erro', 'Falha ao deslogar. Tente novamente.');
               }

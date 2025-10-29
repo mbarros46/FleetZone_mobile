@@ -1,4 +1,5 @@
 import { ThemeProvider } from '@react-navigation/native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useFonts } from 'expo-font';
 // evitar import direto (problemas de tipagem em algumas versões)
 const { Stack } = require('expo-router');
@@ -69,11 +70,13 @@ export default function RootLayout() {
 
   return (
     <ThemeProviderCustom>
-      <AuthProvider>
-        <LanguageProvider>
-          <AppNav />
-        </LanguageProvider>
-      </AuthProvider>
+      <SafeAreaProvider>
+        <AuthProvider>
+          <LanguageProvider>
+            <AppNav />
+          </LanguageProvider>
+        </AuthProvider>
+      </SafeAreaProvider>
     </ThemeProviderCustom>
   );
 }
