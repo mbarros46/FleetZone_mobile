@@ -98,25 +98,25 @@ export default function DetalhesScreen() {
             <Ionicons name="search" size={32} color="#FF6B35" />
           </View>
           <ThemedText type="title" style={styles.title}>
-            Buscar Motocicleta
+            {t('search_title', lang)}
           </ThemedText>
           <ThemedText style={styles.subtitle}>
-            Digite a placa para visualizar os detalhes
+            {t('search_subtitle', lang)}
           </ThemedText>
         </View>
 
         {/* Quick Search Buttons */}
         <View style={styles.quickSearchCard}>
-          <ThemedText style={styles.quickSearchTitle}>🚀 Busca Rápida - Motos Disponíveis:</ThemedText>
+          <ThemedText style={styles.quickSearchTitle}>{t('quick_search_title', lang)}</ThemedText>
             <Stack direction="row" spacing={12} style={styles.quickButtonsGrid}>
             {motosMock.map((moto) => (
               <TouchableOpacity
                 key={moto.placa}
                 style={styles.quickSearchButton}
-                onPress={() => {
+                  onPress={() => {
                   setValue('placa', moto.placa);
                   setMotoSelecionada(moto);
-                  Alert.alert('Moto Encontrada!', `${moto.modelo} carregada com sucesso.`);
+                  Alert.alert(t('moto_found_title', lang), `${moto.modelo} ${t('moto_loaded_success', lang)}`);
                 }}
                 activeOpacity={0.8}
               >
@@ -131,20 +131,20 @@ export default function DetalhesScreen() {
         <View style={styles.searchCard}>
           <View style={styles.searchHeader}>
             <Ionicons name="document-text" size={20} color="#FF6B35" />
-            <ThemedText style={styles.searchTitle}>Consulta por Placa</ThemedText>
+            <ThemedText style={styles.searchTitle}>{t('search_by_plate', lang)}</ThemedText>
           </View>
 
           <ControlledInput
             name="placa"
             control={control}
-            placeholder="Digite a placa (ABC-1234)"
+            placeholder={t('placeholder_plate_search', lang)}
             error={errors.placa}
             autoCapitalize="characters"
             maxLength={8}
           />
 
           <AppButton
-            title="Buscar Motocicleta"
+            title={t('search_button', lang)}
             loading={isSubmitting}
             onPress={handleSubmit(onSubmit) as any}
             style={[styles.searchButton, { backgroundColor: accentColor }]}
@@ -155,15 +155,15 @@ export default function DetalhesScreen() {
         {motoSelecionada && (
           <TouchableOpacity
             style={styles.resetButton}
-            onPress={() => {
+              onPress={() => {
               setMotoSelecionada(null);
               setValue('placa', '');
-              Alert.alert('Busca Limpa', 'Você pode fazer uma nova busca agora.');
+              Alert.alert(t('reset_search_title', lang), t('reset_search_message', lang));
             }}
             activeOpacity={0.8}
           >
             <Ionicons name="refresh" size={16} color="#666" />
-            <ThemedText style={styles.resetButtonText}>Nova Busca</ThemedText>
+            <ThemedText style={styles.resetButtonText}>{t('new_search_label', lang)}</ThemedText>
           </TouchableOpacity>
         )}
 
@@ -190,29 +190,29 @@ export default function DetalhesScreen() {
 
             <View style={styles.infoGrid}>
               <View style={styles.infoRow}>
-                <ThemedText style={styles.infoLabel}>Placa</ThemedText>
+                <ThemedText style={styles.infoLabel}>{t('label_plate', lang)}</ThemedText>
                 <ThemedText style={styles.infoValue}>{motoSelecionada.placa}</ThemedText>
               </View>
 
               <View style={styles.infoRow}>
-                <ThemedText style={styles.infoLabel}>Pátio</ThemedText>
+                <ThemedText style={styles.infoLabel}>{t('label_patio', lang)}</ThemedText>
                 <ThemedText style={styles.infoValue}>{motoSelecionada.patio}</ThemedText>
               </View>
 
               <View style={styles.infoRow}>
-                <ThemedText style={styles.infoLabel}>Data de Entrada</ThemedText>
+                <ThemedText style={styles.infoLabel}>{t('label_entry_date', lang)}</ThemedText>
                 <ThemedText style={styles.infoValue}>
                   {new Date(motoSelecionada.dataEntrada).toLocaleDateString('pt-BR')}
                 </ThemedText>
               </View>
 
               <View style={styles.infoRow}>
-                <ThemedText style={styles.infoLabel}>Quilometragem</ThemedText>
+                <ThemedText style={styles.infoLabel}>{t('label_km', lang)}</ThemedText>
                 <ThemedText style={styles.infoValue}>{motoSelecionada.km.toLocaleString()} km</ThemedText>
               </View>
 
               <View style={styles.infoRow}>
-                <ThemedText style={styles.infoLabel}>Próxima Manutenção</ThemedText>
+                <ThemedText style={styles.infoLabel}>{t('label_next_maintenance', lang)}</ThemedText>
                 <ThemedText style={styles.infoValue}>
                   {new Date(motoSelecionada.manutencao).toLocaleDateString('pt-BR')}
                 </ThemedText>

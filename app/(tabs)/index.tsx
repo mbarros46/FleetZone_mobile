@@ -39,23 +39,23 @@ export default function HomeScreen() {
           <ThemedView style={[styles.statCard, { backgroundColor: surfaceColor, borderColor: borderColor }]}>
             <Ionicons name="speedometer" size={24} color={accentColor} />
             <ThemedText style={styles.statNumber}>12</ThemedText>
-            <ThemedText style={styles.statLabel}>Motos Ativas</ThemedText>
+            <ThemedText style={styles.statLabel}>{t('stats.active_motos')}</ThemedText>
           </ThemedView>
           <ThemedView style={[styles.statCard, { backgroundColor: surfaceColor, borderColor: borderColor }]}>
             <Ionicons name="checkmark-circle" size={24} color="#4CAF50" />
             <ThemedText style={styles.statNumber}>8</ThemedText>
-            <ThemedText style={styles.statLabel}>Disponíveis</ThemedText>
+            <ThemedText style={styles.statLabel}>{t('stats.available')}</ThemedText>
           </ThemedView>
           <ThemedView style={[styles.statCard, { backgroundColor: surfaceColor, borderColor: borderColor }]}>
             <Ionicons name="build" size={24} color="#FF9800" />
             <ThemedText style={styles.statNumber}>4</ThemedText>
-            <ThemedText style={styles.statLabel}>Manutenção</ThemedText>
+            <ThemedText style={styles.statLabel}>{t('stats.maintenance')}</ThemedText>
           </ThemedView>
         </ThemedView>
 
         <ThemedView style={styles.buttonContainer}>
           <AppButton
-            title="Ver Motos"
+            title={t('buttons.view_motos')}
             icon="list"
             onPress={() => {
               // @ts-ignore - navegar para a aba Motos
@@ -65,7 +65,7 @@ export default function HomeScreen() {
           />
 
           <AppButton
-            title="Cadastrar Moto"
+            title={t('buttons.create_moto')}
             icon="add-circle"
             onPress={() => {
               // @ts-ignore - navegar para o formulário (criação)
@@ -78,7 +78,7 @@ export default function HomeScreen() {
           />
 
           <AppButton
-            title="Configurações"
+            title={t('buttons.settings')}
             icon="settings"
             onPress={() => {
               // @ts-ignore - abrir a aba configurações
@@ -92,7 +92,7 @@ export default function HomeScreen() {
 
           {/* Seção de Autenticação para teste */}
           <ThemedView style={styles.authSection}>
-            <ThemedText style={styles.sectionTitle}>Autenticação (Para teste)</ThemedText>
+            <ThemedText style={styles.sectionTitle}>{t('auth.test_section')}</ThemedText>
             <TouchableOpacity 
               style={[styles.authButton, { backgroundColor: accentColor }]}
               onPress={() => {
@@ -102,7 +102,7 @@ export default function HomeScreen() {
               activeOpacity={0.8}
             >
               <Ionicons name="log-in" size={20} color="white" style={styles.buttonIcon} />
-              <ThemedText style={styles.primaryButtonText}>Login</ThemedText>
+              <ThemedText style={styles.primaryButtonText}>{t('auth.login')}</ThemedText>
             </TouchableOpacity>
 
             <TouchableOpacity 
@@ -114,7 +114,7 @@ export default function HomeScreen() {
               activeOpacity={0.8}
             >
               <Ionicons name="person-add" size={20} color="white" style={styles.buttonIcon} />
-              <ThemedText style={styles.primaryButtonText}>Cadastro</ThemedText>
+              <ThemedText style={styles.primaryButtonText}>{t('auth.register')}</ThemedText>
             </TouchableOpacity>
           </ThemedView>
           <View style={styles.langContainer}>

@@ -2,7 +2,7 @@ import { apiConfig } from './api';
 
 export async function register(nome: string, email: string, senha: string) {
   try {
-    const r = await fetch(`${apiConfig.baseURL}/api/auth/register`, {
+  const r = await fetch(`${apiConfig.baseURL}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ nome, email, senha }),
@@ -27,7 +27,7 @@ export async function register(nome: string, email: string, senha: string) {
 
 export async function login(email: string, senha: string) {
   try {
-    const r = await fetch(`${apiConfig.baseURL}/api/auth/login`, {
+  const r = await fetch(`${apiConfig.baseURL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, senha }),

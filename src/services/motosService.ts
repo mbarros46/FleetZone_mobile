@@ -8,7 +8,7 @@ export interface MotoDTO {
   patioId?: number;
 }
 
-const base = `${apiConfig.baseURL}/api/motos`;
+const base = `${apiConfig.baseURL}/motos`;
 
 export const motosService = {
   async list(token?: string): Promise<MotoDTO[]> {

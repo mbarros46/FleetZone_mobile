@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { StyleSheet, FlatList, TextInput } from 'react-native';
 
 import { ThemedText, ThemedView } from '../../src/components';
+import { useTranslation } from 'react-i18next';
 import { useThemeColor } from '../../hooks/useThemeColor';
 
 const dadosMockados = [
@@ -32,6 +33,7 @@ const dadosMockados = [
 ];
 
 export default function ExploreScreen() {
+  const { t } = useTranslation();
   const [busca, setBusca] = useState('');
   const cardColor = useThemeColor({}, 'card');
   const borderColor = useThemeColor({}, 'border');
@@ -46,11 +48,11 @@ export default function ExploreScreen() {
   return (
     <ThemedView style={styles.container}>
       <ThemedText type="title" style={styles.title}>
-        Explorar Motos
+        {t('explore.title')}
       </ThemedText>
       <TextInput
         style={[styles.input, { backgroundColor: cardColor, borderColor: borderColor }]}
-        placeholder="Buscar por modelo, local ou pátio"
+        placeholder={t('explore.search_placeholder')}
         value={busca}
         onChangeText={setBusca}
         placeholderTextColor={useThemeColor({}, 'icon')}
@@ -64,10 +66,10 @@ export default function ExploreScreen() {
               {item.modelo}
             </ThemedText>
             <ThemedText style={[styles.itemText, styles.darkText]}>
-              Pátio: {item.patio}
+              {t('explore.patio')} {item.patio}
             </ThemedText>
             <ThemedText style={[styles.itemText, styles.darkText]}>
-              Localização: {item.localizacao}
+              {t('explore.location')} {item.localizacao}
             </ThemedText>
           </ThemedView>
         )}

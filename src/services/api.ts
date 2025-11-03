@@ -6,7 +6,8 @@ declare const process: {
   };
 };
 
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://172.20.10.3:8080';
+// Default base URL for local development (backend Java API)
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8085';
 
 export const apiConfig = {
   baseURL: API_BASE_URL,

@@ -78,9 +78,9 @@ export default function ConfiguracoesScreen() {
   const onSubmit = async (data: ConfigForm) => {
     try {
       await saveAccentColor(data.corDestaque);
-      Alert.alert('Sucesso', 'Configurações salvas!');
+      Alert.alert(t('success_label', lang), t('settings_saved', lang));
     } catch (error) {
-      Alert.alert('Erro', 'Não foi possível salvar as configurações');
+      Alert.alert(t('error_label', lang), t('settings_save_fail', lang));
     }
   };
 
@@ -100,10 +100,10 @@ export default function ConfiguracoesScreen() {
             <Ionicons name="settings" size={32} color={accentColor} />
           </View>
           <ThemedText type="title" style={styles.title}>
-            Configurações
+            {t('settings_title', lang)}
           </ThemedText>
           <ThemedText style={styles.subtitle}>
-            Personalize a aparência e comportamento do app
+            {t('settings_subtitle', lang)}
           </ThemedText>
         </View>
 
@@ -111,13 +111,13 @@ export default function ConfiguracoesScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Ionicons name="color-palette" size={20} color={accentColor} />
-            <ThemedText style={styles.sectionTitle}>Aparência</ThemedText>
+            <ThemedText style={styles.sectionTitle}>{t('appearance', lang)}</ThemedText>
           </View>
 
           <View style={styles.card}>
             <View style={styles.settingItem}>
               <View style={styles.settingRow}>
-                <ThemedText style={styles.settingLabel}>Tema do App</ThemedText>
+                <ThemedText style={styles.settingLabel}>{t('theme_label', lang)}</ThemedText>
                 <View style={styles.themeStatus}>
                   <Ionicons 
                     name={effectiveTheme === 'dark' ? 'moon' : 'sunny'} 
@@ -125,7 +125,7 @@ export default function ConfiguracoesScreen() {
                     color={accentColor} 
                   />
                   <ThemedText style={[styles.themeStatusText, { color: accentColor }]}>
-                    {effectiveTheme === 'dark' ? 'Escuro' : 'Claro'} 
+                    {effectiveTheme === 'dark' ? t('theme_dark', lang) : t('theme_light', lang)}
                     {mode === 'system' ? ' (Auto)' : ''}
                   </ThemedText>
                 </View>
@@ -141,7 +141,7 @@ export default function ConfiguracoesScreen() {
                   ]}
                   onPress={() => {
                     setMode('light');
-                    Alert.alert('Tema Alterado', 'Tema claro aplicado com sucesso!');
+                    Alert.alert(t('theme_changed_title', lang), t('theme_changed_light', lang));
                   }}
                   activeOpacity={0.7}
                 >
@@ -150,7 +150,7 @@ export default function ConfiguracoesScreen() {
                     styles.themeOptionText,
                     mode === 'light' && { color: accentColor, fontWeight: '600' }
                   ]}>
-                    Claro
+                    {t('theme_light', lang)}
                   </ThemedText>
                   {mode === 'light' && (
                     <Ionicons name="checkmark-circle" size={16} color={accentColor} style={styles.checkIcon} />
@@ -167,7 +167,7 @@ export default function ConfiguracoesScreen() {
                   ]}
                   onPress={() => {
                     setMode('dark');
-                    Alert.alert('Tema Alterado', 'Tema escuro aplicado com sucesso!');
+                    Alert.alert(t('theme_changed_title', lang), t('theme_changed_dark', lang));
                   }}
                   activeOpacity={0.7}
                 >
@@ -176,7 +176,7 @@ export default function ConfiguracoesScreen() {
                     styles.themeOptionText,
                     mode === 'dark' && { color: accentColor, fontWeight: '600' }
                   ]}>
-                    Escuro
+                    {t('theme_dark', lang)}
                   </ThemedText>
                   {mode === 'dark' && (
                     <Ionicons name="checkmark-circle" size={16} color={accentColor} style={styles.checkIcon} />
@@ -193,7 +193,7 @@ export default function ConfiguracoesScreen() {
                   ]}
                   onPress={() => {
                     setMode('system');
-                    Alert.alert('Tema Alterado', 'Tema automático ativado - segue o sistema!');
+                    Alert.alert(t('theme_changed_title', lang), t('theme_changed_system', lang));
                   }}
                   activeOpacity={0.7}
                 >
@@ -202,7 +202,7 @@ export default function ConfiguracoesScreen() {
                     styles.themeOptionText,
                     mode === 'system' && { color: accentColor, fontWeight: '600' }
                   ]}>
-                    Sistema
+                    {t('theme_system', lang)}
                   </ThemedText>
                   {mode === 'system' && (
                     <Ionicons name="checkmark-circle" size={16} color={accentColor} style={styles.checkIcon} />
@@ -217,7 +217,7 @@ export default function ConfiguracoesScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Ionicons name="brush" size={20} color={accentColor} />
-            <ThemedText style={styles.sectionTitle}>Cores</ThemedText>
+            <ThemedText style={styles.sectionTitle}>{t('colors', lang)}</ThemedText>
           </View>
 
           <View style={styles.card}>
@@ -225,7 +225,7 @@ export default function ConfiguracoesScreen() {
               <View style={styles.colorSection}>
                 <View style={styles.colorPreview}>
                   <View style={[styles.colorCircle, { backgroundColor: accentColor }]} />
-                  <ThemedText style={styles.colorLabel}>Cor de Destaque</ThemedText>
+                  <ThemedText style={styles.colorLabel}>{t('accent_color_label', lang)}</ThemedText>
                 </View>
                 
                 <ControlledInput
@@ -240,7 +240,7 @@ export default function ConfiguracoesScreen() {
                 />
 
                 <View style={styles.colorPresets}>
-                  <ThemedText style={styles.presetsLabel}>Cores Predefinidas:</ThemedText>
+                  <ThemedText style={styles.presetsLabel}>{t('colors_presets', lang)}</ThemedText>
                   <Stack direction="row" spacing={8} style={styles.presetsGrid}>
                     {[
                       { name: 'Laranja', color: '#FF6B35' },
@@ -256,7 +256,7 @@ export default function ConfiguracoesScreen() {
                         onPress={() => {
                           setValue('corDestaque', preset.color);
                           saveAccentColor(preset.color);
-                          Alert.alert('Cor Alterada', `Cor ${preset.name} aplicada!`);
+                          Alert.alert(t('success_label', lang), `Cor ${preset.name} aplicada!`);
                         }}
                         activeOpacity={0.8}
                       >
@@ -272,7 +272,7 @@ export default function ConfiguracoesScreen() {
 
         {/* Save Button */}
         <AppButton
-          title="Salvar Alterações"
+          title={t('save_changes', lang)}
           icon="checkmark"
           loading={isSubmitting}
           onPress={handleSubmit(onSubmit) as any}
@@ -281,7 +281,7 @@ export default function ConfiguracoesScreen() {
         />
         {isAuthenticated && (
           <AppButton
-            title="Sair"
+            title={t('logout', lang)}
             variant="outline"
             color={accentColor}
             onPress={async () => {
@@ -292,14 +292,14 @@ export default function ConfiguracoesScreen() {
                 // @ts-ignore - tipos dependem da configuração do router
                 navigation.reset({ index: 0, routes: [{ name: 'auth/login' }] });
               } catch (e) {
-                Alert.alert('Erro', 'Falha ao deslogar. Tente novamente.');
+                Alert.alert(t('error_label', lang), t('logout_fail', lang));
               }
             }}
             style={[styles.logoutButton, { borderColor: accentColor }]}
           />
         )}
         <AppButton
-          title="Sobre o App"
+          title={t('about_title', lang)}
           variant="outline"
           color={accentColor}
             onPress={() => {
@@ -310,31 +310,31 @@ export default function ConfiguracoesScreen() {
         />
 
         <AppButton
-          title={pushToken ? 'Token registrado' : 'Registrar Notificações'}
+          title={pushToken ? t('push_token_registered', lang) : t('register_notifications', lang)}
           variant={pushToken ? 'outline' : 'solid'}
           color={accentColor}
           onPress={async () => {
             try {
               const token = await registerForPushNotificationsAsync();
               setPushToken(token);
-                      Alert.alert(t('register_success', lang));
+              Alert.alert(t('success_label', lang), t('register_success', lang));
             } catch (e: any) {
-                      Alert.alert(t('register_fail', lang), String(e?.message ?? e));
+              Alert.alert(t('error_label', lang), String(e?.message ?? t('register_fail', lang)));
             }
           }}
           style={{ marginTop: 12 }}
         />
 
         <AppButton
-          title="Enviar Notificação de Teste"
+          title={t('send_test_notification', lang)}
           color={accentColor}
           onPress={async () => {
             setSending(true);
             try {
               await sendTestPushNotification(pushToken ?? undefined);
-              Alert.alert('Ok', 'Notificação enviada (verifique seu dispositivo)');
+              Alert.alert(t('success_label', lang), t('test_notification_sent', lang));
             } catch (e: any) {
-              Alert.alert('Erro', String(e?.message ?? e));
+              Alert.alert(t('error_label', lang), String(e?.message ?? e));
             } finally {
               setSending(false);
             }
@@ -349,9 +349,9 @@ export default function ConfiguracoesScreen() {
           <Stack direction="row" spacing={12}>
             <TouchableOpacity
               onPress={async () => {
-                await setLang('pt');
-                Alert.alert('Idioma', 'Português selecionado');
-              }}
+                  await setLang('pt');
+                  Alert.alert(t('language_label', lang), t('language_selected_pt', lang));
+                }}
               style={[styles.themeOption, lang === 'pt' && styles.themeOptionSelected]}
               accessibilityLabel="Selecionar Português"
               accessible
@@ -363,9 +363,9 @@ export default function ConfiguracoesScreen() {
 
             <TouchableOpacity
               onPress={async () => {
-                await setLang('es');
-                Alert.alert('Idioma', 'Español seleccionado');
-              }}
+                  await setLang('es');
+                  Alert.alert(t('language_label', lang), t('language_selected_es', lang));
+                }}
               style={[styles.themeOption, lang === 'es' && styles.themeOptionSelected]}
               accessibilityLabel="Seleccionar Español"
               accessible

@@ -31,23 +31,23 @@ export default function RegisterScreen() {
 
   const validateForm = () => {
     if (!name || !email || !password || !confirmPassword) {
-      Alert.alert('Erro', t('fill_data', lang));
+      Alert.alert(t('error_label', lang), t('fill_data', lang));
       return false;
     }
 
     if (password !== confirmPassword) {
-      Alert.alert('Erro', 'As senhas não coincidem');
+      Alert.alert(t('error_label', lang), t('passwords_not_match', lang));
       return false;
     }
 
     if (password.length < 6) {
-      Alert.alert('Erro', 'A senha deve ter pelo menos 6 caracteres');
+      Alert.alert(t('error_label', lang), t('password_too_short', lang));
       return false;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      Alert.alert('Erro', 'Por favor, insira um email válido');
+      Alert.alert(t('error_label', lang), t('invalid_email', lang));
       return false;
     }
 
@@ -60,12 +60,12 @@ export default function RegisterScreen() {
     setLoading(true);
     try {
       await register(name, email, password);
-      Alert.alert('Sucesso', 'Cadastro realizado com sucesso!');
+    Alert.alert(t('success_label', lang), t('register_success_message', lang));
   // @ts-ignore - navegar para as tabs principais
   navigation.navigate('(tabs)');
     } catch (error) {
-      const message = (error as any)?.message ?? 'Falha no cadastro. Tente novamente.';
-      Alert.alert('Erro', message);
+      const message = (error as any)?.message ?? t('save_fail', lang);
+      Alert.alert(t('error_label', lang), message);
     } finally {
       setLoading(false);
     }
@@ -141,9 +141,9 @@ export default function RegisterScreen() {
             />
 
             <View style={styles.loginContainer}>
-              <Text style={styles.loginText}>{lang === 'es' ? '¿Ya tienes una cuenta?' : 'Já tem uma conta? '}</Text>
+              <Text style={styles.loginText}>{t('already_have_account', lang)}</Text>
               <AppButton
-                title="Faça login"
+                title={t('login_cta', lang)}
                 variant="outline"
                 color={accentColor}
                 onPress={goToLogin}

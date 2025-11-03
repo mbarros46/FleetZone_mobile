@@ -17,7 +17,8 @@ export interface PatioRelatorio {
   localizacao?: string;
 }
 
-const base = `${apiConfig.baseURL}/api/patios`;
+// Backend exposes pátios/filiais under /filiais — align with API
+const base = `${apiConfig.baseURL}/filiais`;
 
 export const patiosService = {
   async list(token?: string): Promise<Patio[]> {

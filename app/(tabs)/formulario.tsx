@@ -143,7 +143,7 @@ export default function FormularioScreen() {
     return (
       <ThemedView style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
         <ActivityIndicator />
-        <ThemedText style={{ marginTop: 8 }}>Carregando dados da moto…</ThemedText>
+        <ThemedText style={{ marginTop: 8 }}>{t('loading_moto_data', lang)}</ThemedText>
       </ThemedView>
     );
   }
@@ -183,7 +183,7 @@ export default function FormularioScreen() {
                 name="modelo"
                 control={control}
                 label=""
-                placeholder="Ex: Honda CG 160, Yamaha Fazer 250"
+                placeholder={t('placeholder_model_examples', lang)}
                 error={errors.modelo}
                 autoCapitalize="words"
                 style={styles.input}
@@ -199,7 +199,7 @@ export default function FormularioScreen() {
                 name="placa"
                 control={control}
                 label=""
-                placeholder="ABC-1234"
+                placeholder={t('placeholder_plate', lang)}
                 error={errors.placa}
                 autoCapitalize="characters"
                 maxLength={8}
@@ -216,7 +216,7 @@ export default function FormularioScreen() {
                 name="status"
                 control={control}
                 label=""
-                placeholder="Disponível, Em manutenção..."
+                placeholder={t('placeholder_status_examples', lang)}
                 error={errors.status}
                 autoCapitalize="sentences"
                 style={styles.input}
@@ -234,7 +234,7 @@ export default function FormularioScreen() {
             />
 
             <AppButton
-              title="Limpar Formulário"
+              title={t('clear_form', lang)}
               icon="refresh"
               variant="outline"
               color="#666"
@@ -249,7 +249,7 @@ export default function FormularioScreen() {
         <View style={styles.helperSection}>
           <Ionicons name="information-circle" size={16} color="#999" />
           <ThemedText style={styles.helperText}>
-            Certifique-se de que a placa está no formato correto (ABC-1234)
+            {t('plate_format_hint', lang)}
           </ThemedText>
         </View>
       </ThemedView>

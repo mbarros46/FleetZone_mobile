@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { login as loginService, register as registerService } from '../services/authService';
+import { setAuthToken } from '../services/axiosApi';
 
 interface Usuario {
   id: string;
@@ -42,6 +43,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       if (storagedToken && storagedUser) {
         setToken(storagedToken);
+        // configure axios client with stored token
+        setAuthToken(storagedToken);
         setUsuario(JSON.parse(storagedUser));
       }
     } catch (error) {
@@ -62,6 +65,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       await AsyncStorage.setItem('@FleetZone:user', JSON.stringify(authUsuario));
 
       setToken(authToken);
+  // set token for axios client
+  setAuthToken(authToken);
       setUsuario(authUsuario);
     } catch (error) {
       throw error;
@@ -81,6 +86,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       await AsyncStorage.setItem('@FleetZone:user', JSON.stringify(authUsuario));
 
       setToken(authToken);
+  // set token for axios client
+  setAuthToken(authToken);
       setUsuario(authUsuario);
     } catch (error) {
       throw error;
@@ -95,6 +102,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       await AsyncStorage.removeItem('@FleetZone:user');
       
       setToken(null);
+      // clear axios auth header
+      setAuthToken();
       setUsuario(null);
     } catch (error) {
       console.error('Erro ao fazer logout:', error);

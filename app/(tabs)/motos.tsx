@@ -1,10 +1,12 @@
 ﻿import { StyleSheet } from 'react-native';
 import { ThemedText, ThemedView } from '../../src/components';
+import { useTranslation } from 'react-i18next';
 
 export default function MotosScreen() {
+  const { t } = useTranslation();
   return (
     <ThemedView style={styles.container}>
-      <ThemedText>Lista de motos (temporário)</ThemedText>
+      <ThemedText>{t('motos.list_placeholder')}</ThemedText>
     </ThemedView>
   );
 }

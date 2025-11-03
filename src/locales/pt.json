@@ -4,11 +4,54 @@
     "subtitle": "Gerencie suas frotas com facilidade"
   },
   "buttons": {
+    "view_motos": "Ver Motos",
+    "create_moto": "Cadastrar Moto",
+    "settings": "Configurações",
     "language_pt": "Português",
-    "language_es": "Espanhol"
+    "language_es": "Espanhol",
+    "edit": "Editar",
+    "save": "Salvar",
+    "delete": "Remover"
   },
   "about": {
     "title": "Sobre o aplicativo",
     "description": "O FleetZone ajuda você a monitorar, gerenciar e otimizar frotas de motocicletas de forma eficiente e intuitiva."
   }
+  ,
+  "stats": {
+    "active_motos": "Motos Ativas",
+    "available": "Disponíveis",
+    "maintenance": "Manutenção"
+  },
+  "auth": {
+    "test_section": "Autenticação (Para teste)",
+    "login": "Login",
+    "register": "Cadastro"
+  },
+  "explore": {
+    "title": "Explorar Motos",
+    "search_placeholder": "Buscar por modelo, local ou pátio",
+    "patio": "Pátio:",
+    "location": "Localização:"
+  },
+  "motos": {
+    "list_placeholder": "Lista de motos (temporário)",
+    "empty_list": "Nenhuma moto encontrada.",
+    "create_title": "Cadastrar Moto",
+    "edit_title": "Editar Moto",
+    "created_success": "Moto cadastrada com sucesso.",
+    "updated_success": "Moto atualizada com sucesso.",
+    "delete_success": "Moto removida com sucesso.",
+    "create_fail": "Falha ao cadastrar a moto.",
+    "update_fail": "Falha ao atualizar a moto.",
+    "delete_fail": "Falha ao remover a moto."
+  }
+  ,
+  "placeholders": {
+    "modelo": "Modelo da moto",
+    "placa": "ABC-1234",
+    "patio": "ID do pátio",
+    "km": "Quilometragem"
+  },
+  "loading_label": "Carregando..."
 }

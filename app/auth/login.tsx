@@ -28,21 +28,21 @@ export default function LoginScreen() {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert('Erro', t('fill_data', lang));
+      Alert.alert(t('error_label', lang), t('fill_data', lang));
       return;
     }
 
     setLoading(true);
     try {
   await login(email, password);
-  Alert.alert('Sucesso', t('enter', lang));
+  Alert.alert(t('success_label', lang), t('enter', lang));
   // navegar para as tabs principais
   // navegar para as tabs principais
   // @ts-ignore - navigation types depend on expo-router integration
   navigation.navigate('(tabs)');
     } catch (error) {
-      const message = (error as any)?.message ?? 'Falha no login. Verifique suas credenciais.';
-      Alert.alert('Erro', message);
+      const message = (error as any)?.message ?? t('login_fail', lang);
+      Alert.alert(t('error_label', lang), message);
     } finally {
       setLoading(false);
     }
@@ -91,7 +91,7 @@ export default function LoginScreen() {
             />
 
             <View style={styles.registerContainer}>
-              <Text style={styles.registerText}>{lang === 'es' ? '¿No tienes una cuenta?' : 'Não tem uma conta? '}</Text>
+              <Text style={styles.registerText}>{t('no_account', lang)}</Text>
               <AppButton
                 title={t('register', lang)}
                 variant="outline"
