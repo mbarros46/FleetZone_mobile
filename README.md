@@ -142,3 +142,56 @@ npm run format     # Formata o código
 
 ---
 
+## 🧭 API Backend (Java)
+
+O backend em Java expõe endpoints REST que o aplicativo mobile consome. Abaixo está um resumo das rotas e exemplos rápidos para integração.
+
+Base URL (exemplo local):
+
+```
+http://localhost:8085/
+```
+
+Exemplo para o arquivo `.env` do app mobile:
+
+```
+EXPO_PUBLIC_API_URL=http://192.168.0.105:8080
+```
+
+Endpoints principais
+
+- Autenticação
+	- POST /auth/login
+		- Descrição: recebe { email, senha } e retorna um token JWT e dados do usuário.
+		- Exemplo body: { "email": "teste@exemplo.com", "senha": "123456" }
+	- POST /auth/register (opcional)
+		- Descrição: registra um novo usuário.
+
+- Motos (CRUD)
+	- GET /motos — lista todas as motos
+	- GET /motos/{id} — detalhes da moto
+	- POST /motos — cria nova moto (body JSON com campos como modelo, placa, patioId, km)
+	- PUT /motos/{id} — atualiza moto
+	- DELETE /motos/{id} — remove moto
+
+- Filiais / Pátios
+	- GET /filiais — lista pátios/filiais disponíveis
+	- GET /filiais/{id} — detalhes da filial
+
+- IoT / Sensor
+	- GET /iot/status — retorna status do sensor (online/offline, última leitura)
+	- POST /iot/event — envia evento (ex.: detecção de moto)
+		- Exemplo body: { "motoId": 123, "action": "detected", "timestamp": "2025-11-02T12:34:56Z" }
+
+Autorização
+
+- Endpoints protegidos retornam 401 sem um header Authorization válido:
+- Header: Authorization: Bearer {JWT}
+
+Dica de integração
+
+- Configure `EXPO_PUBLIC_API_URL` para apontar para o host onde o backend Java está rodando.
+- No fluxo de login, ao receber o token, o app configura o cliente HTTP (axios) com o header Authorization automaticamente (veja `src/services/axiosApi.ts`).
+
+Se quiser, eu também posso adicionar exemplos de requests curl ou um arquivo Postman/Insomnia para facilitar testes manuais.
+

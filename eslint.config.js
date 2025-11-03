@@ -1,14 +1,22 @@
-module.exports = {
-  parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint'],
-  extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended'],
-  ignorePatterns: ['node_modules/', 'dist/', 'android/', 'ios/'],
-  parserOptions: {
-    ecmaVersion: 2020,
-    sourceType: 'module',
-    ecmaFeatures: { jsx: true },
-  },
-  rules: {
-    // Keep defaults, project-specific rules can be added later.
-  },
-};
+const tsPlugin = require('@typescript-eslint/eslint-plugin');
+const tsParser = require('@typescript-eslint/parser');
+
+module.exports = [
+	{
+		files: ['**/*.ts', '**/*.tsx', '**/*.d.ts'],
+		languageOptions: {
+			parser: tsParser,
+			parserOptions: {
+				ecmaVersion: 2020,
+				sourceType: 'module',
+				ecmaFeatures: { jsx: true },
+				project: './tsconfig.json',
+			},
+		},
+		plugins: { '@typescript-eslint': tsPlugin },
+		rules: {
+			'no-unused-vars': 'off',
+			'@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+		},
+	},
+];

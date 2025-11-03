@@ -18,7 +18,7 @@ export default function HomeScreen() {
   const { t, i18n } = useTranslation();
   
   return (
-    <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+  <ScrollView style={styles.scrollView} contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
       <LinearGradient
         colors={[accentColor, `${accentColor}88`]}
         style={styles.header}
@@ -157,7 +157,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   container: {
-    flex: 1,
     padding: 20,
     marginTop: 12,
     borderTopLeftRadius: 20,
