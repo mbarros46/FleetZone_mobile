@@ -1,0 +1,14 @@
+{
+  "home": {
+    "title": "Bienvenido a FleetZone",
+    "subtitle": "Administra tus flotas fácilmente"
+  },
+  "buttons": {
+    "language_pt": "Portugués",
+    "language_es": "Español"
+  },
+  "about": {
+    "title": "Acerca de la aplicación",
+    "description": "FleetZone te ayuda a monitorear, administrar y optimizar flotas de motocicletas de manera eficiente e intuitiva."
+  }
+}

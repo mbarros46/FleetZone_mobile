@@ -1,4 +1,5 @@
 import { StyleSheet, ScrollView, View, TouchableOpacity, Alert } from 'react-native';
+import { Button } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText, ThemedView } from '../../src/components';
@@ -6,12 +7,15 @@ import AppButton from '../../src/components/AppButton';
 import { useAccentColor } from '../../src/styles/theme';
 import { useThemeColor } from '../../hooks/useThemeColor';
 import { useNavigation } from '@react-navigation/native';
+import '../../src/locales';
+import { useTranslation } from 'react-i18next';
 
 export default function HomeScreen() {
   const { accentColor } = useAccentColor();
   const navigation = useNavigation();
   const surfaceColor = useThemeColor({}, 'surface');
   const borderColor = useThemeColor({}, 'border');
+  const { t, i18n } = useTranslation();
   
   return (
     <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
@@ -22,10 +26,10 @@ export default function HomeScreen() {
         <View style={styles.headerContent}>
           <Ionicons name="bicycle" size={60} color="white" />
           <ThemedText type="title" style={styles.title}>
-            FleetZone
+            {t('home.title')}
           </ThemedText>
           <ThemedText style={styles.subtitle}>
-            Gerencie sua frota de motocicletas
+            {t('home.subtitle')}
           </ThemedText>
         </View>
       </LinearGradient>
@@ -54,7 +58,7 @@ export default function HomeScreen() {
             title="Ver Motos"
             icon="list"
             onPress={() => {
-              // @ts-ignore
+              // @ts-ignore - navegar para a aba Motos
               navigation.navigate('motos');
             }}
             style={[styles.primaryButton, { backgroundColor: accentColor }]}
@@ -64,7 +68,7 @@ export default function HomeScreen() {
             title="Cadastrar Moto"
             icon="add-circle"
             onPress={() => {
-              // @ts-ignore
+              // @ts-ignore - navegar para o formulário (criação)
               navigation.navigate('formulario');
             }}
             variant="outline"
@@ -77,7 +81,7 @@ export default function HomeScreen() {
             title="Configurações"
             icon="settings"
             onPress={() => {
-              // @ts-ignore
+              // @ts-ignore - abrir a aba configurações
               navigation.navigate('configuracoes');
             }}
             variant="outline"
@@ -92,7 +96,7 @@ export default function HomeScreen() {
             <TouchableOpacity 
               style={[styles.authButton, { backgroundColor: accentColor }]}
               onPress={() => {
-                // @ts-ignore
+                // @ts-ignore - navegar para tela de login
                 navigation.navigate('auth/login');
               }}
               activeOpacity={0.8}
@@ -104,7 +108,7 @@ export default function HomeScreen() {
             <TouchableOpacity 
               style={[styles.authButton, { backgroundColor: '#4CAF50' }]}
               onPress={() => {
-                // @ts-ignore
+                // @ts-ignore - navegar para tela de registro
                 navigation.navigate('auth/register');
               }}
               activeOpacity={0.8}
@@ -113,6 +117,14 @@ export default function HomeScreen() {
               <ThemedText style={styles.primaryButtonText}>Cadastro</ThemedText>
             </TouchableOpacity>
           </ThemedView>
+          <View style={styles.langContainer}>
+            <View style={styles.langButton}>
+              <Button title={t('buttons.language_pt')} onPress={() => i18n.changeLanguage('pt')} />
+            </View>
+            <View style={styles.langButton}>
+              <Button title={t('buttons.language_es')} onPress={() => i18n.changeLanguage('es')} />
+            </View>
+          </View>
         </ThemedView>
       </ThemedView>
     </ScrollView>
@@ -251,4 +263,6 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
+  langContainer: { flexDirection: 'row', justifyContent: 'center', marginBottom: 20 },
+  langButton: { marginHorizontal: 8 },
 });

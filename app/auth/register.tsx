@@ -23,7 +23,9 @@ export default function RegisterScreen() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const { accentColor } = useAccentColor();
-  const navigation = useNavigation();
+   const navigation = useNavigation();
+   // Remover uso do router
+   // const router = useRouter();
   const { register } = useAuth();
   const { lang } = useLanguage();
 
@@ -59,8 +61,8 @@ export default function RegisterScreen() {
     try {
       await register(name, email, password);
       Alert.alert('Sucesso', 'Cadastro realizado com sucesso!');
-      // @ts-ignore - navigation types depend on expo-router integration
-      navigation.navigate('(tabs)');
+  // @ts-ignore - navegar para as tabs principais
+  navigation.navigate('(tabs)');
     } catch (error) {
       const message = (error as any)?.message ?? 'Falha no cadastro. Tente novamente.';
       Alert.alert('Erro', message);
@@ -70,8 +72,8 @@ export default function RegisterScreen() {
   };
 
   const goToLogin = () => {
-    // @ts-ignore
-    navigation.navigate('auth/login');
+  // @ts-ignore - navegar para tela de login
+  navigation.navigate('auth/login');
   };
 
   return (

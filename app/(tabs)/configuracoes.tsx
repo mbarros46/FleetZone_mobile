@@ -288,6 +288,7 @@ export default function ConfiguracoesScreen() {
               try {
                 await logout();
                 // Resetamos a navegação para remover a pilha de telas autenticadas
+                // Resetamos a navegação para remover a pilha de telas autenticadas
                 // @ts-ignore - tipos dependem da configuração do router
                 navigation.reset({ index: 0, routes: [{ name: 'auth/login' }] });
               } catch (e) {
@@ -301,10 +302,10 @@ export default function ConfiguracoesScreen() {
           title="Sobre o App"
           variant="outline"
           color={accentColor}
-          onPress={() => {
-            // @ts-ignore - expo-router types
-            navigation.navigate('configuracoes/sobre');
-          }}
+            onPress={() => {
+              // @ts-ignore - navegar para a tela 'sobre'
+              navigation.navigate('sobre');
+            }}
           style={[styles.aboutButton, { borderColor: accentColor, marginTop: 12 }]}
         />
 

@@ -37,6 +37,7 @@ export default function LoginScreen() {
   await login(email, password);
   Alert.alert('Sucesso', t('enter', lang));
   // navegar para as tabs principais
+  // navegar para as tabs principais
   // @ts-ignore - navigation types depend on expo-router integration
   navigation.navigate('(tabs)');
     } catch (error) {
@@ -96,7 +97,7 @@ export default function LoginScreen() {
                 variant="outline"
                 color={accentColor}
                 onPress={() => {
-                  // @ts-ignore
+                  // @ts-ignore - navegar para tela de registro
                   navigation.navigate('auth/register');
                 }}
                 style={{ marginLeft: 8 }}
