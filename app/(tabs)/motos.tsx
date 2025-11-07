@@ -28,20 +28,13 @@ export default function MotosScreen() {
 
   useEffect(() => {
     let mounted = true;
-    (async () => {
-      try {
-        const data = await motosHttpService.list();
-        if (mounted) setMotos(data);
-      } catch (err) {
-        console.warn(err);
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    })();
+    load().finally(() => {
+      if (mounted) setLoading(false);
+    });
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [load]);
 
   const onRefresh = async () => {
       try {

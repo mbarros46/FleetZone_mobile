@@ -193,6 +193,42 @@ Dica de integração
 - Configure `EXPO_PUBLIC_API_URL` para apontar para o host onde o backend Java está rodando.
 - No fluxo de login, ao receber o token, o app configura o cliente HTTP (axios) com o header Authorization automaticamente (veja `src/services/axiosApi.ts`).
 
+Autenticação JWT (exemplos)
+
+Se você implementar a opção JWT no backend, o endpoint `/auth/login` deve retornar JSON com um campo `token`, por exemplo:
+
+```json
+{ "token": "eyJhbGciOiJI...", "user": { "username": "test@example.com", "id": 1 } }
+```
+
+Curl de exemplo para login (JSON):
+
+```powershell
+curl -X POST "http://localhost:8085/auth/login" -H "Content-Type: application/json" -d '{"email":"test@example.com","senha":"123456"}'
+```
+
+Teste protegido (exemplo de GET /motos com token):
+
+```powershell
+curl -H "Authorization: Bearer <TOKEN_AQUI>" http://localhost:8085/motos
+```
+
+Usando `EXPO_PUBLIC_API_TOKEN` para desenvolvimento
+
+Para testes locais rápidos (sem alterar o backend) você pode definir um token de desenvolvimento no `.env`:
+
+```
+EXPO_PUBLIC_API_URL=http://localhost:8085
+EXPO_PUBLIC_API_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+`scripts/crud-test.js` agora tenta, nesta ordem:
+- usar `EXPO_PUBLIC_API_TOKEN` se definido;
+- tentar `POST /auth/login` com JSON e ler `token` da resposta (se o backend devolver JWT);
+- tentar login por formulário (`/login`) para capturar cookie de sessão como último recurso.
+
+Assim o script pode rodar em vários cenários: JWT, sessão ou token dev.
+
 Testes locais e token de desenvolvimento
 
 - Se o backend exigir autenticação para criar/atualizar/excluir recursos, você pode definir um token estático para testes locais no arquivo `.env` (não commitá-lo):

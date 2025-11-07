@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { StyleSheet, Alert, View, ActivityIndicator } from 'react-native';
+import { StyleSheet, Alert, View } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { ThemedView, ThemedText } from '../../../src/components';
 import { ControlledInput } from '../../../src/components/ControlledInput';

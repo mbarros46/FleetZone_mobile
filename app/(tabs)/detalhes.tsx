@@ -5,7 +5,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
-  ActivityIndicator,
   ScrollView,
   View,
 } from 'react-native';
@@ -20,17 +19,10 @@ import { useRouter } from 'expo-router';
 import AppButton from '../../src/components/AppButton';
 import Stack from '../../src/components/Stack';
 import { useAccentColor } from '../../src/styles/theme';
-import { useThemeColor } from '../../hooks/useThemeColor';
 
-const buscaSchema = z.object({
-  placa: z
-    .string()
-    .min(1, 'Placa é obrigatória')
-    .regex(/^[A-Z]{3}-\d{4}$/, 'Placa deve seguir o formato ABC-1234')
-    .toUpperCase(),
-});
-
-type BuscaForm = z.infer<typeof buscaSchema>;
+type BuscaForm = {
+  placa: string;
+};
 
 const motosMock = [
   {
@@ -59,6 +51,15 @@ export default function DetalhesScreen() {
   const { lang } = useLanguage();
   const router = useRouter();
 
+  // validation schema uses localized messages
+  const buscaSchema = z.object({
+    placa: z
+      .string()
+      .min(1, t('placa_required', lang))
+      .regex(/^[A-Z]{3}-\d{4}$/i, t('placa_format', lang))
+      .transform((s) => s.toUpperCase()),
+  });
+
   const {
     control,
     handleSubmit,
@@ -66,9 +67,7 @@ export default function DetalhesScreen() {
     formState: { errors, isSubmitting },
   } = useForm<BuscaForm>({
     resolver: zodResolver(buscaSchema),
-    defaultValues: {
-      placa: '',
-    },
+    defaultValues: { placa: '' },
   });
 
   const onSubmit = async (data: BuscaForm) => {
@@ -209,16 +208,21 @@ export default function DetalhesScreen() {
                 {motoSelecionada.modelo}
               </ThemedText>
               <View style={styles.statusBadge}>
-                <Ionicons 
-                  name={motoSelecionada.status === 'Disponível' ? 'checkmark-circle' : 
-                        motoSelecionada.status === 'Em manutenção' ? 'construct' : 'close-circle'} 
-                  size={16} 
-                  color={getStatusColor(motoSelecionada.status)}
-                  style={{ marginRight: 6 }}
-                />
-                <ThemedText style={[styles.statusText, { color: getStatusColor(motoSelecionada.status) }]}>
-                  {motoSelecionada.status}
-                </ThemedText>
+                    <Ionicons
+                      name={
+                        motoSelecionada.status === t('status.available', lang)
+                          ? 'checkmark-circle'
+                          : motoSelecionada.status === t('status.maintenance', lang)
+                          ? 'construct'
+                          : 'close-circle'
+                      }
+                      size={16}
+                      color={(() => getStatusColor(motoSelecionada.status))()}
+                      style={{ marginRight: 6 }}
+                    />
+                    <ThemedText style={[styles.statusText, { color: getStatusColor(motoSelecionada.status) }]}>
+                      {motoSelecionada.status}
+                    </ThemedText>
               </View>
             </View>
 
@@ -263,8 +267,11 @@ export default function DetalhesScreen() {
 }
 
 function getStatusColor(status: string) {
-  if (status === 'Disponível') return '#4CAF50';
-  if (status === 'Em manutenção') return '#FF9800';
+  // Accept localized status labels (pt/es/en)
+  const available = [t('status.available', 'pt'), t('status.available', 'es'), t('status.available', 'en')];
+  const maintenance = [t('status.maintenance', 'pt'), t('status.maintenance', 'es'), t('status.maintenance', 'en')];
+  if (available.includes(status)) return '#4CAF50';
+  if (maintenance.includes(status)) return '#FF9800';
   return '#F44336';
 }
 

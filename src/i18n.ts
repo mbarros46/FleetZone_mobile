@@ -64,6 +64,24 @@ const translations: Record<SupportedLang, Record<string, string>> = {
   placeholder_model_examples: 'Ex: Honda CG 160, Yamaha Fazer 250',
   placeholder_plate: 'ABC-1234',
   placeholder_status_examples: 'Disponível, Em manutenção...',
+  // explore sample patios and cities
+  'explore.patio_A': 'Pátio A',
+  'explore.patio_B': 'Pátio B',
+  'explore.patio_C': 'Pátio C',
+  'explore.city_sp': 'São Paulo',
+  'explore.city_campinas': 'Campinas',
+  'explore.city_santos': 'Santos',
+  // confirmation / delete messages (aliases)
+  confirm_label: 'Confirmar',
+  confirm_delete_moto: 'Deseja realmente excluir esta moto?',
+  delete_success: 'Moto removida com sucesso.',
+  // validation messages
+  placa_required: 'Placa é obrigatória',
+  placa_format: 'Placa deve seguir o formato ABC-1234',
+  // status labels
+  'status.available': 'Disponível',
+  'status.maintenance': 'Em manutenção',
+  'status.unavailable': 'Indisponível',
   theme_light: 'Claro',
   theme_dark: 'Escuro',
   theme_system: 'Sistema',
@@ -177,6 +195,24 @@ const translations: Record<SupportedLang, Record<string, string>> = {
   placeholder_model_examples: 'Ej: Honda CG 160, Yamaha Fazer 250',
   placeholder_plate: 'ABC-1234',
   placeholder_status_examples: 'Disponible, En mantenimiento...',
+  // explore sample patios and cities
+  'explore.patio_A': 'Patio A',
+  'explore.patio_B': 'Patio B',
+  'explore.patio_C': 'Patio C',
+  'explore.city_sp': 'Sao Paulo',
+  'explore.city_campinas': 'Campinas',
+  'explore.city_santos': 'Santos',
+  // confirmation / delete messages (aliases)
+  confirm_label: 'Confirmar',
+  confirm_delete_moto: '¿Desea eliminar esta moto?',
+  delete_success: 'Moto eliminada con éxito.',
+  // validation messages
+  placa_required: 'La patente es obligatoria',
+  placa_format: 'La patente debe seguir el formato ABC-1234',
+  // status labels
+  'status.available': 'Disponible',
+  'status.maintenance': 'En mantenimiento',
+  'status.unavailable': 'No disponible',
   theme_light: 'Claro',
   theme_dark: 'Oscuro',
   theme_system: 'Sistema',
@@ -290,6 +326,24 @@ const translations: Record<SupportedLang, Record<string, string>> = {
   placeholder_model_examples: 'Ex: Honda CG 160, Yamaha Fazer 250',
   placeholder_plate: 'ABC-1234',
   placeholder_status_examples: 'Available, Under maintenance...',
+  // explore sample patios and cities
+  'explore.patio_A': 'Yard A',
+  'explore.patio_B': 'Yard B',
+  'explore.patio_C': 'Yard C',
+  'explore.city_sp': 'São Paulo',
+  'explore.city_campinas': 'Campinas',
+  'explore.city_santos': 'Santos',
+  // confirmation / delete messages (aliases)
+  confirm_label: 'Confirm',
+  confirm_delete_moto: 'Do you really want to remove this moto?',
+  delete_success: 'Moto removed successfully.',
+  // validation messages
+  placa_required: 'Plate is required',
+  placa_format: 'Plate must follow format ABC-1234',
+  // status labels
+  'status.available': 'Available',
+  'status.maintenance': 'Under maintenance',
+  'status.unavailable': 'Unavailable',
   theme_light: 'Light',
   theme_dark: 'Dark',
   theme_system: 'System',

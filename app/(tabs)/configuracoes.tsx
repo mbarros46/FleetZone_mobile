@@ -1,11 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import {
   StyleSheet,
   TouchableOpacity,
   Alert,
-  ActivityIndicator,
   ScrollView,
   View,
 } from 'react-native';
@@ -21,8 +19,7 @@ import AppButton from '../../src/components/AppButton';
 import Stack from '../../src/components/Stack';
 import { useThemeCustom } from '../../src/contexts/theme';
 import { useAccentColor } from '../../src/styles/theme';
-import { useThemeColor } from '../../hooks/useThemeColor';
-import { useState, useEffect as useEffectReact } from 'react';
+import { useState, useEffect } from 'react';
 import { registerForPushNotificationsAsync, getSavedPushToken, sendTestPushNotification } from '../../src/services/notifications';
 import { t } from '../../src/i18n';
 import { useLanguage } from '../../src/contexts';
@@ -52,7 +49,7 @@ export default function ConfiguracoesScreen() {
   const insets = useSafeAreaInsets();
   const bottomOverflow = useBottomTabOverflow?.() ?? 0;
 
-  useEffectReact(() => {
+  useEffect(() => {
     (async () => {
       const token = await getSavedPushToken();
       setPushToken(token);

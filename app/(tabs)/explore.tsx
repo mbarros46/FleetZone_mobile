@@ -5,35 +5,17 @@ import { ThemedText, ThemedView } from '../../src/components';
 import { useTranslation } from 'react-i18next';
 import { useThemeColor } from '../../hooks/useThemeColor';
 
-const dadosMockados = [
-  {
-    id: '1',
-    modelo: 'Honda CG 160',
-    patio: 'Pátio A',
-    localizacao: 'São Paulo',
-  },
-  {
-    id: '2',
-    modelo: 'Yamaha Fazer 250',
-    patio: 'Pátio B',
-    localizacao: 'Campinas',
-  },
-  {
-    id: '3',
-    modelo: 'Honda Biz 125',
-    patio: 'Pátio A',
-    localizacao: 'São Paulo',
-  },
-  {
-    id: '4',
-    modelo: 'Yamaha Crosser 150',
-    patio: 'Pátio C',
-    localizacao: 'Santos',
-  },
-];
+// sample data kept for UI demo — patio and city labels will use translations
 
 export default function ExploreScreen() {
   const { t } = useTranslation();
+  // build mocked data using translations so strings are i18n-controlled
+  const dadosMockados = [
+    { id: '1', modelo: 'Honda CG 160', patio: t('explore.patio_A'), localizacao: t('explore.city_sp') },
+    { id: '2', modelo: 'Yamaha Fazer 250', patio: t('explore.patio_B'), localizacao: t('explore.city_campinas') },
+    { id: '3', modelo: 'Honda Biz 125', patio: t('explore.patio_A'), localizacao: t('explore.city_sp') },
+    { id: '4', modelo: 'Yamaha Crosser 150', patio: t('explore.patio_C'), localizacao: t('explore.city_santos') },
+  ];
   const [busca, setBusca] = useState('');
   const cardColor = useThemeColor({}, 'card');
   const borderColor = useThemeColor({}, 'border');

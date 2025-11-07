@@ -6,7 +6,20 @@ async function run() {
   console.log('CRUD test base URL:', BASE);
   console.log('Attempting to obtain auth (token or session cookie)');
   let cookieHeader = null;
+  let obtainedToken = null;
   if (!process.env.EXPO_PUBLIC_API_TOKEN) {
+    // First try JSON login that returns { token }
+    try {
+      console.log('Trying JSON login at /auth/login');
+      const loginJson = await axios.post(`${BASE}/auth/login`, { email: 'test@example.com', senha: '123456' }, { headers: { 'Content-Type': 'application/json' }, timeout: 5000 });
+      if (loginJson && loginJson.data && (loginJson.data.token || loginJson.data.accessToken)) {
+        obtainedToken = loginJson.data.token || loginJson.data.accessToken;
+        console.log('Obtained JWT token from JSON /auth/login');
+      }
+    } catch (err) {
+      // ignore, fallback to form-login below
+    }
+
     try {
       // Try form login to obtain session cookie (for servers using form-based auth)
       const form = new URLSearchParams({ username: 'test@example.com', email: 'test@example.com', senha: '123456' }).toString();
@@ -35,14 +48,47 @@ async function run() {
     }
   }
 
+  // prepare common headers for subsequent requests (token or cookie)
+  const commonHeaders = {};
+  // Priority: EXPO_PUBLIC_API_TOKEN env > obtainedToken from /auth/login JSON > session cookie
+  if (process.env.EXPO_PUBLIC_API_TOKEN) {
+    commonHeaders.Authorization = `Bearer ${process.env.EXPO_PUBLIC_API_TOKEN}`;
+  } else if (obtainedToken) {
+    commonHeaders.Authorization = `Bearer ${obtainedToken}`;
+  } else if (cookieHeader) {
+    commonHeaders.Cookie = cookieHeader;
+  }
+
+  // If we have a session cookie but no Authorization token, try to obtain CSRF token
+  if (!commonHeaders.Authorization && cookieHeader) {
+    try {
+      // Many Spring apps expose /csrf returning JSON { _csrf: { token, parameterName, headerName } }
+      const r = await axios.get(`${BASE}/csrf`, { headers: { Cookie: cookieHeader }, timeout: 3000 });
+      const token = (r.data && (r.data._csrf?.token || r.data.token)) || null;
+      if (token) {
+        // Default header name is X-CSRF-TOKEN or as provided
+        const headerName = (r.data && r.data._csrf && r.data._csrf.headerName) || 'X-CSRF-TOKEN';
+        commonHeaders[headerName] = token;
+        console.log('Obtained CSRF token from /csrf and set header', headerName);
+      } else {
+        // Some apps expose token as cookie XSRF-TOKEN — try to parse it from cookieHeader
+        const xsrf = cookieHeader.split(';').map((c) => c.trim()).find((c) => c.startsWith('XSRF-TOKEN='));
+        if (xsrf) {
+          const val = xsrf.split('=')[1];
+          commonHeaders['X-XSRF-TOKEN'] = val;
+          console.log('Parsed XSRF-TOKEN from cookie and set X-XSRF-TOKEN header');
+        }
+      }
+    } catch (err) {
+      // ignore — server may not expose /csrf endpoint
+    }
+  }
+
   // 1) Create
   const payload = { modelo: 'Teste CI', placa: 'TST-0001', status: 'Disponível' };
   let created;
   try {
-    const headers = {};
-    if (process.env.EXPO_PUBLIC_API_TOKEN) headers.Authorization = `Bearer ${process.env.EXPO_PUBLIC_API_TOKEN}`;
-    if (!headers.Authorization && cookieHeader) headers.Cookie = cookieHeader;
-    const r = await axios.post(`${BASE}/motos`, payload, { timeout: 5000, headers, maxRedirects: 0 });
+    const r = await axios.post(`${BASE}/motos`, payload, { timeout: 5000, headers: commonHeaders, maxRedirects: 0 });
     console.log('Create status:', r.status);
     created = r.data;
     console.log('Created:', created);
@@ -60,7 +106,7 @@ async function run() {
   if (!id) {
     console.warn('Could not determine created id from response, attempt to fetch by plate');
     try {
-      const list = await axios.get(`${BASE}/motos`, { timeout: 5000 });
+    const list = await axios.get(`${BASE}/motos`, { timeout: 5000, headers: commonHeaders });
       const found = list.data.find((m) => (m.placa || '').toLowerCase() === payload.placa.toLowerCase());
       if (found) {
         console.log('Found created by plate, id=', found.id);
@@ -79,7 +125,7 @@ async function run() {
 
   // 2) Get
   try {
-    const r = await axios.get(`${BASE}/motos/${realId}`, { timeout: 5000 });
+  const r = await axios.get(`${BASE}/motos/${realId}`, { timeout: 5000, headers: commonHeaders });
     console.log('Get status:', r.status, 'data:', r.data);
   } catch (err) {
     console.error('Get failed:', err.message || err);
@@ -88,7 +134,7 @@ async function run() {
 
   // 3) Update
   try {
-    const r = await axios.put(`${BASE}/motos/${realId}`, { modelo: 'Teste CI Atualizado', placa: payload.placa, status: 'Em manutenção' }, { timeout: 5000 });
+  const r = await axios.put(`${BASE}/motos/${realId}`, { modelo: 'Teste CI Atualizado', placa: payload.placa, status: 'Em manutenção' }, { timeout: 5000, headers: commonHeaders });
     console.log('Update status:', r.status, 'data:', r.data);
   } catch (err) {
     console.error('Update failed:', err.message || err);
@@ -97,7 +143,7 @@ async function run() {
 
   // 4) Delete
   try {
-    const r = await axios.delete(`${BASE}/motos/${realId}`, { timeout: 5000 });
+  const r = await axios.delete(`${BASE}/motos/${realId}`, { timeout: 5000, headers: commonHeaders });
     console.log('Delete status:', r.status);
   } catch (err) {
     console.error('Delete failed:', err.message || err);
