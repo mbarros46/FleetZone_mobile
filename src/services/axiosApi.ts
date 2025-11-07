@@ -15,4 +15,9 @@ export const setAuthToken = (token?: string) => {
   }
 };
 
+// If developer provided a static token via env (EXPO_PUBLIC_API_TOKEN), use it by default
+if (typeof process !== 'undefined' && process?.env?.EXPO_PUBLIC_API_TOKEN) {
+  client.defaults.headers.common.Authorization = `Bearer ${process.env.EXPO_PUBLIC_API_TOKEN}`;
+}
+
 export default client;

@@ -15,6 +15,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { ControlledInput, ThemedText, ThemedView } from '../../src/components';
 import { useLanguage } from '../../src/contexts';
 import { t } from '../../src/i18n';
+import { motosHttpService } from '../../src/services/motosHttpService';
+import { useRouter } from 'expo-router';
 import AppButton from '../../src/components/AppButton';
 import Stack from '../../src/components/Stack';
 import { useAccentColor } from '../../src/styles/theme';
@@ -52,11 +54,10 @@ const motosMock = [
 ];
 
 export default function DetalhesScreen() {
-  const [motoSelecionada, setMotoSelecionada] = useState<
-    (typeof motosMock)[0] | null
-  >(null);
+  const [motoSelecionada, setMotoSelecionada] = useState<any | null>(null);
   const { accentColor } = useAccentColor();
   const { lang } = useLanguage();
+  const router = useRouter();
 
   const {
     control,
@@ -72,14 +73,22 @@ export default function DetalhesScreen() {
 
   const onSubmit = async (data: BuscaForm) => {
     try {
-      // Simular busca na API
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      const moto = motosMock.find(
-        (m) => m.placa.toLowerCase() === data.placa.toLowerCase(),
-      );
-      if (moto) {
-        setMotoSelecionada(moto);
+      // Buscar via serviço
+  const list = await motosHttpService.list();
+  const found = list.find((m) => (m.placa || '').toLowerCase() === data.placa.toLowerCase());
+      if (found) {
+        // tentar buscar detalhes completos por id, se disponível
+        if (found.id) {
+          try {
+            const full = await motosHttpService.get(Number(found.id));
+            setMotoSelecionada(full);
+          } catch (e) {
+            // fallback para o objeto encontrado
+            setMotoSelecionada(found);
+          }
+        } else {
+          setMotoSelecionada(found);
+        }
       } else {
         setMotoSelecionada(null);
         Alert.alert(t('not_found_label', lang), t('not_found_message', lang));
@@ -87,6 +96,31 @@ export default function DetalhesScreen() {
     } catch (error) {
       Alert.alert(t('error_label', lang), t('search_fail', lang));
     }
+  };
+
+  const handleEdit = (id?: number) => {
+    if (!id) return;
+    router.push(`/motos/${id}/edit`);
+  };
+
+  const handleDelete = async (id?: number) => {
+    if (!id) return;
+    Alert.alert(t('confirm_label', lang), t('confirm_delete_moto', lang), [
+      { text: t('cancel_label', lang), style: 'cancel' },
+      {
+        text: t('delete_label', lang),
+        style: 'destructive',
+        onPress: async () => {
+              try {
+                await motosHttpService.remove(id);
+            setMotoSelecionada(null);
+            Alert.alert(t('success_label', lang), t('delete_success', lang));
+          } catch (e: any) {
+            Alert.alert(t('error_label', lang), e?.message ?? t('delete_fail', lang));
+          }
+        },
+      },
+    ]);
   };
 
   return (
@@ -218,6 +252,9 @@ export default function DetalhesScreen() {
                 </ThemedText>
               </View>
             </View>
+            <View style={{ height: 16 }} />
+            <AppButton title={t('buttons.edit') || 'Editar'} onPress={() => handleEdit(motoSelecionada.id)} style={{ marginBottom: 8 }} />
+            <AppButton title={t('buttons.delete') || 'Excluir'} onPress={() => handleDelete(motoSelecionada.id)} variant="outline" color="#d9534f" />
           </View>
         )}
       </ThemedView>

@@ -3,6 +3,7 @@
 declare const process: {
   env: {
     EXPO_PUBLIC_API_URL?: string;
+    EXPO_PUBLIC_API_TOKEN?: string;
   };
 };
 
@@ -38,7 +39,7 @@ export interface Usuario {
 // Headers com autenticação
 export const getAuthHeaders = (token?: string) => ({
   ...apiConfig.headers,
-  ...(token && { Authorization: `Bearer ${token}` }),
+  ...(token || process.env.EXPO_PUBLIC_API_TOKEN ? { Authorization: `Bearer ${token ?? process.env.EXPO_PUBLIC_API_TOKEN}` } : {}),
 });
 
 // Função helper para requisições autenticadas

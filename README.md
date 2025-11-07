@@ -193,5 +193,27 @@ Dica de integração
 - Configure `EXPO_PUBLIC_API_URL` para apontar para o host onde o backend Java está rodando.
 - No fluxo de login, ao receber o token, o app configura o cliente HTTP (axios) com o header Authorization automaticamente (veja `src/services/axiosApi.ts`).
 
+Testes locais e token de desenvolvimento
+
+- Se o backend exigir autenticação para criar/atualizar/excluir recursos, você pode definir um token estático para testes locais no arquivo `.env` (não commitá-lo):
+
+```
+# .env (exemplo local — NÃO subir para o repositório)
+EXPO_PUBLIC_API_URL=http://localhost:8085
+EXPO_PUBLIC_API_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+- Com `EXPO_PUBLIC_API_TOKEN` definido, o cliente axios usado pelo app (`src/services/axiosApi.ts`) já irá incluir o header `Authorization: Bearer <token>` automaticamente, permitindo testar endpoints protegidos.
+
+- Scripts úteis (rodar a partir da raiz do projeto):
+
+```powershell
+# Smoke test de disponibilidade
+node .\scripts\smoke-test.js
+
+# CRUD test (cria, busca, atualiza e deleta uma moto) — configure EXPO_PUBLIC_API_TOKEN se necessário
+node .\scripts\crud-test.js
+```
+
 Se quiser, eu também posso adicionar exemplos de requests curl ou um arquivo Postman/Insomnia para facilitar testes manuais.
 

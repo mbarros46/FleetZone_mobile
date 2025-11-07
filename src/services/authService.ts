@@ -27,11 +27,39 @@ export async function register(nome: string, email: string, senha: string) {
 
 export async function login(email: string, senha: string) {
   try {
-  const r = await fetch(`${apiConfig.baseURL}/auth/login`, {
+    // Primeiro tentamos JSON (API REST comum)
+    let r = await fetch(`${apiConfig.baseURL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, senha }),
-    });
+      redirect: 'manual', // tentar detectar redirects
+    } as any);
+
+    // Se o servidor retornou um redirect (3xx), pode ser um formulário de login (não JSON)
+    if (r.status >= 300 && r.status < 400) {
+      const location = r.headers.get('location') || 'unknown';
+      throw new Error(`Auth endpoint redirected (location: ${location})`);
+    }
+
+    // Se Content-Type for JSON, parseamos
+    const ct = r.headers.get('content-type') || '';
+    if (r.ok && ct.includes('application/json')) {
+      return r.json();
+    }
+
+    // Caso o POST JSON não funcione, tentamos enviar form-urlencoded (alguns backends esperam isso)
+    r = await fetch(`${apiConfig.baseURL}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ email, senha }).toString(),
+      redirect: 'manual',
+    } as any);
+
+    if (r.status >= 300 && r.status < 400) {
+      const location = r.headers.get('location') || 'unknown';
+      throw new Error(`Auth endpoint redirected after form post (location: ${location})`);
+    }
+
     if (!r.ok) throw new Error(await r.text());
     return r.json();
   } catch (err) {

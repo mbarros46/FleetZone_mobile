@@ -8,10 +8,17 @@ async function run() {
 
   // Auth login (try, may return 401)
   try {
-    const r = await axios.post(`${BASE}/auth/login`, { email: 'test@example.com', senha: '123456' }, { timeout: 5000 });
+    // don't follow redirects so we can detect if server expects form login / redirects
+    const r = await axios.post(`${BASE}/auth/login`, { email: 'test@example.com', senha: '123456' }, { timeout: 5000, maxRedirects: 0 });
     results.push({ endpoint: '/auth/login', ok: true, status: r.status });
   } catch (err) {
-    results.push({ endpoint: '/auth/login', ok: false, message: err.message });
+    // axios will throw on non-2xx or redirect when maxRedirects=0
+    const resp = err.response;
+    if (resp) {
+      results.push({ endpoint: '/auth/login', ok: false, status: resp.status, headers: resp.headers, data: resp.data });
+    } else {
+      results.push({ endpoint: '/auth/login', ok: false, message: err.message });
+    }
   }
 
   // GET /motos
