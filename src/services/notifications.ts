@@ -25,6 +25,22 @@ export async function registerForPushNotificationsAsync() {
     const tokenData = await Notifications.getExpoPushTokenAsync();
     const token = tokenData.data;
     await AsyncStorage.setItem(PUSH_TOKEN_KEY, token);
+
+    // Configure Android notification channel for production builds
+    if (Platform.OS === 'android') {
+      try {
+        await Notifications.setNotificationChannelAsync('default', {
+          name: 'Default',
+          importance: Notifications.AndroidImportance.MAX,
+          vibrationPattern: [0, 250, 250, 250],
+          sound: 'default',
+          lightColor: '#FF231F7C',
+        });
+      } catch (e) {
+        // non-fatal, channel creation might fail on older Android versions
+        console.warn('Failed to create notification channel', e);
+      }
+    }
     return token;
   } catch (err) {
     throw err;
@@ -48,6 +64,10 @@ export async function sendTestPushNotification(expoPushToken?: string) {
     title: t('test_notification_title', lang),
     body: t('test_notification_body', lang),
     data: { test: true },
+    android: {
+      channelId: 'default',
+      sound: 'default'
+    }
   } as any;
 
   // Expo push endpoint
