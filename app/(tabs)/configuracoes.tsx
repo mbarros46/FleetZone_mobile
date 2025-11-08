@@ -346,11 +346,13 @@ export default function ConfiguracoesScreen() {
           <Stack direction="row" spacing={12}>
             <TouchableOpacity
               onPress={async () => {
-                  await setLang('pt');
-                  Alert.alert(t('language_label', lang), t('language_selected_pt', lang));
+                  const newLang: any = 'pt';
+                  await setLang(newLang);
+                  // mostrar confirmação já no idioma selecionado
+                  Alert.alert(t('language_label', newLang), t('language_selected_pt', newLang));
                 }}
               style={[styles.themeOption, lang === 'pt' && styles.themeOptionSelected]}
-              accessibilityLabel="Selecionar Português"
+              accessibilityLabel={"Português"}
               accessible
               activeOpacity={0.7}
             >
@@ -360,11 +362,12 @@ export default function ConfiguracoesScreen() {
 
             <TouchableOpacity
               onPress={async () => {
-                  await setLang('es');
-                  Alert.alert(t('language_label', lang), t('language_selected_es', lang));
+                  const newLang: any = 'es';
+                  await setLang(newLang);
+                  Alert.alert(t('language_label', newLang), t('language_selected_es', newLang));
                 }}
               style={[styles.themeOption, lang === 'es' && styles.themeOptionSelected]}
-              accessibilityLabel="Seleccionar Español"
+              accessibilityLabel={"Español"}
               accessible
               activeOpacity={0.7}
             >

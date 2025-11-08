@@ -251,5 +251,4 @@ node .\scripts\smoke-test.js
 node .\scripts\crud-test.js
 ```
 
-Se quiser, eu também posso adicionar exemplos de requests curl ou um arquivo Postman/Insomnia para facilitar testes manuais.
 

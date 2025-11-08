@@ -68,7 +68,7 @@ export default function MotoDetailScreen() {
       <ThemedText>{t('label_patio')}: {moto.patio}</ThemedText>
       <ThemedText>{t('label_km')}: {moto.km}</ThemedText>
   <View style={{ height: 20 }} />
-  <AppButton title={t('buttons.edit') || 'Editar'} onPress={() => router.push(`/motos/${id}/edit`)} style={{ marginBottom: 8 }} />
+  <AppButton title={t('buttons.edit')} onPress={() => router.push(`/motos/${id}/edit`)} style={{ marginBottom: 8 }} />
   <AppButton title={t('buttons.delete')} onPress={handleDelete} />
     </ThemedView>
   );

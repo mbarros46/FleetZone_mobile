@@ -68,8 +68,8 @@ export default function EditMotoScreen() {
   <ControlledInput name="patio" control={control} placeholder={t('placeholders.patio') || 'ID do pátio'} keyboardType="numeric" />
   <ControlledInput name="km" control={control} placeholder={t('placeholders.km') || 'KM'} keyboardType="numeric" />
 
-      <View style={{ height: 16 }} />
-      <AppButton title={t('buttons.save') || 'Salvar'} loading={formState.isSubmitting} onPress={handleSubmit(onSubmit) as any} />
+  <View style={{ height: 16 }} />
+  <AppButton title={t('buttons.save')} loading={formState.isSubmitting} onPress={handleSubmit(onSubmit) as any} />
     </ThemedView>
   );
 }

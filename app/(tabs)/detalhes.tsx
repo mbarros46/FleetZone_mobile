@@ -257,8 +257,8 @@ export default function DetalhesScreen() {
               </View>
             </View>
             <View style={{ height: 16 }} />
-            <AppButton title={t('buttons.edit') || 'Editar'} onPress={() => handleEdit(motoSelecionada.id)} style={{ marginBottom: 8 }} />
-            <AppButton title={t('buttons.delete') || 'Excluir'} onPress={() => handleDelete(motoSelecionada.id)} variant="outline" color="#d9534f" />
+            <AppButton title={t('buttons.edit')} onPress={() => handleEdit(motoSelecionada.id)} style={{ marginBottom: 8 }} />
+            <AppButton title={t('buttons.delete')} onPress={() => handleDelete(motoSelecionada.id)} variant="outline" color="#d9534f" />
           </View>
         )}
       </ThemedView>

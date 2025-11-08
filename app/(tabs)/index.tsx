@@ -1,5 +1,5 @@
 import { StyleSheet, ScrollView, View, TouchableOpacity } from 'react-native';
-import { Button } from 'react-native';
+// Button removed from Home; language selection is in Configurações
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText, ThemedView } from '../../src/components';
@@ -15,7 +15,7 @@ export default function HomeScreen() {
   const navigation = useNavigation();
   const surfaceColor = useThemeColor({}, 'surface');
   const borderColor = useThemeColor({}, 'border');
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   
   return (
   <ScrollView style={styles.scrollView} contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
@@ -117,14 +117,7 @@ export default function HomeScreen() {
               <ThemedText style={styles.primaryButtonText}>{t('auth.register')}</ThemedText>
             </TouchableOpacity>
           </ThemedView>
-          <View style={styles.langContainer}>
-            <View style={styles.langButton}>
-              <Button title={t('buttons.language_pt')} onPress={() => i18n.changeLanguage('pt')} />
-            </View>
-            <View style={styles.langButton}>
-              <Button title={t('buttons.language_es')} onPress={() => i18n.changeLanguage('es')} />
-            </View>
-          </View>
+          {/* Language selector removed from Home - kept only in Configurações page */}
         </ThemedView>
       </ThemedView>
     </ScrollView>

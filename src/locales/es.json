@@ -33,7 +33,13 @@
     "title": "Explorar Motos",
     "search_placeholder": "Buscar por modelo, local o patio",
     "patio": "Patio:",
-    "location": "Ubicación:"
+    "location": "Ubicación:",
+    "patio_A": "Patio A",
+    "patio_B": "Patio B",
+    "patio_C": "Patio C",
+    "city_sp": "Sao Paulo",
+    "city_campinas": "Campinas",
+    "city_santos": "Santos"
   },
   "motos": {
     "list_placeholder": "Lista de motos (temporal)",
@@ -55,4 +61,15 @@
     "km": "Kilometraje"
   },
   "loading_label": "Cargando..."
+  ,
+  "error_label": "Error",
+  "success_label": "Éxito",
+  "fetch_fail": "Error al obtener los datos. Intenta nuevamente.",
+  "label_plate": "Patente",
+  "label_patio": "Patio",
+  "label_km": "Kilometraje",
+  "location": "Ubicación",
+  "not_found_message": "Verifica la patente o clave ingresada.",
+  "delete_success": "Moto eliminada con éxito.",
+  "delete_fail": "Error al eliminar la moto."
 }
