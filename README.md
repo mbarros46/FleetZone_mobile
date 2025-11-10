@@ -1,5 +1,10 @@
 # 🚀 FleetZone Mobile
 
+## 👨‍💻 Desenvolvido por
+- Miguel Barros Ramos RM556652
+- Pedro Valentim Merise RM556826
+- Thomas Rodrigues RM558042
+
 ## 📱 Nome do App
 **FleetZone Mobile** - Sistema de Gerenciamento de Frota de Motocicletas
 
